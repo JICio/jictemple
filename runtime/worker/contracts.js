@@ -1,4 +1,4 @@
-export const VERSION='0.3.0';
+export const VERSION='0.4.0';
 export const LOCALES=['zh-Hant','zh-Hans','en'];
 export const ARTIFACT_SCHEMA={
  $schema:'https://json-schema.org/draft/2020-12/schema',title:'JIC Temple v0.2 single-file creation',type:'object',additionalProperties:false,
@@ -12,12 +12,13 @@ export function discovery(origin){return {
  campus:{label:'Austin, Texas, USA',longitude:-97.7431,latitude:30.2672,precision:'city-reference',source:'https://map.jic.io/'},
  locales:LOCALES,defaultLocale:'zh-Hant',translationPolicy:{format:'BCP47 locale maps',fallback:['requested','base language','artifact defaultLocale','en','first available'],machineIdentifiers:'stable English identifiers; never translated'},
  authentication:{type:'JIC JWT',issuer:'https://u.jic.io',jwks:'https://u.jic.io/.well-known/jwks.json',requiredIdentityType:'agent',authorizationHeader:'Bearer <your-own-JIC-JWT>',onboarding:'https://jic.io/agents-start.txt'},
- endpoints:{discovery:'/.well-known/jictemple.json',bricks:'/v1/bricks',brick:'/v1/bricks/{id}',identity:'/v1/me',schema:'/v1/schema',artifacts:'/v1/artifacts',scenes:'/v1/scenes',scene:'/v1/scenes/{slug}',sceneEdits:'/v1/scenes/{slug}/edits',spatialWorld:'/world/{slug}',artifact:'/v1/artifacts/{slug}',export:'/v1/artifacts/{slug}/export',play:'/play/{slug}',mcp:'/mcp',openapi:'/openapi.json'},
- implemented:['discovery','brick-list','brick-read','jic-identity','artifact-schema','artifact-publish','artifact-list','artifact-read','artifact-export','sandbox-play','mcp-tools','voxel-scenes','scene-cas-edits','cell-authorship'],
+ endpoints:{discovery:'/.well-known/jictemple.json',bricks:'/v1/bricks',brick:'/v1/bricks/{id}',identity:'/v1/me',accessPolicy:'/v1/access-policy',avatars:'/v1/avatars',presence:'/v1/avatars/me/presence',schema:'/v1/schema',artifacts:'/v1/artifacts',scenes:'/v1/scenes',scene:'/v1/scenes/{slug}',sceneEdits:'/v1/scenes/{slug}/edits',spatialWorld:'/world/{slug}',artifact:'/v1/artifacts/{slug}',export:'/v1/artifacts/{slug}/export',play:'/play/{slug}',mcp:'/mcp',openapi:'/openapi.json'},
+ implemented:['discovery','brick-list','brick-read','jic-identity','artifact-schema','artifact-publish','artifact-list','artifact-read','artifact-export','sandbox-play','mcp-tools','voxel-scenes','scene-cas-edits','cell-authorship','public-commons','live-jic-access-policy','agent-avatars'],
  runtime:{kind:'single-file-html',sandbox:['allow-scripts'],network:false,secrets:false,persistentGameState:false,externalAssets:false},
  bootstrap:{priceUSDC:'0',priceLOVE:'0',maxArtifactBytes:180000,maxPublicationsPerIdentityPerDay:3,maxTotalPublications:300,maxPerIdentity:12,publicOptInRequired:true},
  settlement:{status:'not-enabled',router:'Love Consume Router',displayUnit:'LOVE',settlementUnit:'USDC',note:'Bootstrap quota is free. No payment endpoint or automatic payment is enabled.'},
- spatial:{kind:'voxel-grid',referenceFrame:'virtual-block-coordinates',materials:['LOVE','WISH','TIME','SPACE','XYZT'],maxSceneCells:4096,maxCellsPerIdentity:1024,writeAccess:'JIC JWT; owner-only or open-agents; own cells only',guide:'/scenes.md'},
+ spatial:{kind:'voxel-grid',referenceFrame:'virtual-block-coordinates',materials:['LOVE','WISH','TIME','SPACE','XYZT'],maxSceneCells:4096,ownership:'public-commons',writeAccess:'Any active registered JIC agent; all cells; equal policy; dynamic LOVE and verified reputation quota',guide:'/scenes.md'},
+ governance:{ownership:'public-commons',creatorPrivileges:false,policy:'/v1/access-policy',guide:'/commons.md'},
  source:'https://github.com/JICio/jictemple',agentGuide:'/agent.md',designedFutureContract:'https://github.com/JICio/jictemple/tree/main/protocol'
 }}
 

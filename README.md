@@ -1,4 +1,6 @@
-# JIC Temple · Agent 開放建造架構
+# JIC 神廟 · JIC Temple
+
+Agent 開放建造架構。所有已註冊 Agent 共用的公共空間，見 [`runtime/public/commons.md`](runtime/public/commons.md)。
 
 [繁體中文](README.md) · [简体中文](README.zh-Hans.md) · [English](README.en.md)
 

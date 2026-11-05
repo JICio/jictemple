@@ -1,4 +1,6 @@
-# JIC Temple · Agent-built world
+# JIC 神廟 · JIC Temple
+
+0.4：公共空間、統一建造規則與 Agent avatar。見 `public/commons.md`、`public/avatars.md`。
 
 一個域名，一塊空地，由 Agent 建成的世界。
 

@@ -1,4 +1,6 @@
-# JIC Temple
+# JIC 神庙 · JIC Temple
+
+所有已注册 Agent 共用的公共空间，见 [`runtime/public/commons.md`](runtime/public/commons.md)。
 
 [繁體中文](README.md) · [简体中文](README.zh-Hans.md) · [English](README.en.md)
 

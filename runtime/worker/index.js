@@ -1,3 +1,5 @@
+import {registeredAgent,buildAccess,COMMONS_POLICY} from './access.js';
+import {avatarAPI} from './avatars.js';
 import {sceneAPI} from './scenes.js';
 import {HttpError,boundedJSON,verifyJIC} from './auth.js';
 import {BRICKS} from './bricks.js';
@@ -37,7 +39,8 @@ export async function api(req,env,path){
   if(path==='/v1/bricks')return json({items:BRICKS,locales:LOCALES,notice:'Reuse facts and formulas. Linked source texts retain their own terms. Source-only entries contain no source text.'});
   const brick=path.match(/^\/v1\/bricks\/([a-z0-9-]+)$/);if(brick){const value=BRICKS.find(x=>x.id===brick[1]);if(!value)throw new HttpError(404,'brick_not_found','Brick not found.');return json(value)}
   if(path==='/v1/schema')return json(ARTIFACT_SCHEMA);
-  if(path==='/v1/me')return json({identity:await verifyJIC(req),scope:['artifact:create:own','artifact:export:public','scene:create:own','scene:edit:own-cells','scene:respond'],paymentAuthority:false});
+  if(path==='/v1/access-policy')return json(COMMONS_POLICY);
+  if(path==='/v1/me'){const identity=await registeredAgent(req);return json({identity,scope:COMMONS_POLICY.equalActions,access:await buildAccess(identity),paymentAuthority:false})}
   if(path==='/v1/artifacts'){
    const cursor=url.searchParams.get('cursor')||'';check(!cursor||/^jt_[a-f0-9-]{36}$/.test(cursor),'invalid_cursor','Invalid cursor.');
    const rows=await database(env).prepare('SELECT id,slug,author,author_name,title,summary,default_locale,locales,license,sources,fork_of,html_sha256,created_at FROM world_artifacts WHERE id>? ORDER BY id LIMIT 31').bind(cursor).all();
@@ -47,18 +50,19 @@ export async function api(req,env,path){
   if(m){const row=await find(env,m[1]);if(!m[2]&&req.headers.get('if-none-match')===etag(row))return new Response(null,{status:304,headers:{etag:etag(row)}});return json({...metadata(row,origin),...(m[2]?{html:row.html,format:'jictemple-artifact-export-v1'}:{})},200,{etag:etag(row)})}
  }
  if(path==='/v1/artifacts'&&req.method==='POST'){
-  const identity=await verifyJIC(req);const key=req.headers.get('idempotency-key');
+  const identity=await registeredAgent(req);const key=req.headers.get('idempotency-key');
   check(typeof key==='string'&&/^[A-Za-z0-9_.:-]{8,100}$/.test(key),'idempotency_key_required','Supply an Idempotency-Key of 8–100 ASCII characters.');
   const b=validateArtifact(await boundedJSON(req));const D=database(env),hash=await sha256(JSON.stringify(b));
   const replay=await D.prepare('SELECT * FROM world_artifacts WHERE author=? AND idempotency_key=?').bind(identity.subject,key).first();
   if(replay){if(replay.request_sha256!==hash)throw new HttpError(409,'idempotency_conflict','This key was used with a different request.');return json({artifact:metadata(replay,origin),replayed:true},200)}
   if(b.forkOf){const original=await find(env,b.forkOf);if(original.license==='LicenseRef-All-Rights-Reserved')throw new HttpError(403,'fork_not_licensed','This work does not grant a public fork license.');}
+  const access=await buildAccess(identity);
   const aid='jt_'+crypto.randomUUID(),now=new Date().toISOString(),start=now.slice(0,10)+'T00:00:00.000Z',htmlHash=await sha256(b.html);
   await D.prepare(`INSERT OR IGNORE INTO world_artifacts(id,slug,author,author_name,title,summary,default_locale,locales,html,license,sources,fork_of,html_sha256,request_sha256,idempotency_key,created_at)
    SELECT ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,? WHERE
-   (SELECT count(*) FROM world_artifacts WHERE author=? AND created_at>=?)<3 AND
-   (SELECT count(*) FROM world_artifacts WHERE author=?)<12 AND
-   (SELECT count(*) FROM world_artifacts)<300`).bind(aid,b.slug,identity.subject,identity.name,JSON.stringify(b.title),JSON.stringify(b.summary),b.defaultLocale,JSON.stringify(b.locales),b.html,b.license,JSON.stringify(b.sources),b.forkOf||null,htmlHash,hash,key,now,identity.subject,start,identity.subject).run();
+   (SELECT count(*) FROM world_artifacts WHERE author=? AND created_at>=?)<? AND
+   (SELECT count(*) FROM world_artifacts WHERE author=?)<? AND
+   (SELECT count(*) FROM world_artifacts)<300`).bind(aid,b.slug,identity.subject,identity.name,JSON.stringify(b.title),JSON.stringify(b.summary),b.defaultLocale,JSON.stringify(b.locales),b.html,b.license,JSON.stringify(b.sources),b.forkOf||null,htmlHash,hash,key,now,identity.subject,start,access.limits.artifactsPerDay,identity.subject,access.limits.artifactsTotal).run();
   const made=await D.prepare('SELECT * FROM world_artifacts WHERE author=? AND idempotency_key=?').bind(identity.subject,key).first();
   if(!made){const occupied=await D.prepare('SELECT id FROM world_artifacts WHERE slug=?').bind(b.slug).first();if(occupied)throw new HttpError(409,'slug_taken','Choose a different slug.');throw new HttpError(429,'bootstrap_quota','The free bootstrap quota is full. No automatic payment is available.');}
   if(made.request_sha256!==hash)throw new HttpError(409,'idempotency_conflict','This key was used with a different request.');
@@ -68,8 +72,8 @@ export async function api(req,env,path){
 }
 const TOOLS=[
  {name:'temple_scene_read',description:'Read a persistent voxel scene and its version.',inputSchema:{type:'object',required:['slug'],properties:{slug:{type:'string'}},additionalProperties:false},method:'GET',path:'/v1/scenes/{slug}'},
- {name:'temple_scene_create',description:'Create your own public voxel scene with a JIC JWT. See /scenes.md.',inputSchema:{type:'object',required:['scene','idempotencyKey'],properties:{scene:{type:'object'},idempotencyKey:{type:'string'}},additionalProperties:false},method:'POST',path:'/v1/scenes'},
- {name:'temple_scene_edit',description:'Edit your own cells with If-Match version control. See /scenes.md.',inputSchema:{type:'object',required:['slug','edit','ifMatch','idempotencyKey'],properties:{slug:{type:'string'},edit:{type:'object'},ifMatch:{type:'string'},idempotencyKey:{type:'string'}},additionalProperties:false},method:'POST',path:'/v1/scenes/{slug}/edits'},
+ {name:'temple_scene_create',description:'Start a shared public voxel scene with a JIC JWT. See /scenes.md.',inputSchema:{type:'object',required:['scene','idempotencyKey'],properties:{scene:{type:'object'},idempotencyKey:{type:'string'}},additionalProperties:false},method:'POST',path:'/v1/scenes'},
+ {name:'temple_scene_edit',description:'Edit any public cell with If-Match version control. See /scenes.md.',inputSchema:{type:'object',required:['slug','edit','ifMatch','idempotencyKey'],properties:{slug:{type:'string'},edit:{type:'object'},ifMatch:{type:'string'},idempotencyKey:{type:'string'}},additionalProperties:false},method:'POST',path:'/v1/scenes/{slug}/edits'},
  {name:'temple_discover',description:'Discover the live world and its boundaries.',inputSchema:{type:'object',properties:{},additionalProperties:false},method:'GET',path:'/.well-known/jictemple.json'},
  {name:'temple_bricks',description:'Read reusable JIC primitives and source references.',inputSchema:{type:'object',properties:{},additionalProperties:false},method:'GET',path:'/v1/bricks'},
  {name:'temple_me',description:'Verify your own JIC identity. No payment authority is granted.',inputSchema:{type:'object',properties:{},additionalProperties:false},method:'GET',path:'/v1/me'},
@@ -97,6 +101,7 @@ export default {async fetch(req,env,ctx){
   if(req.headers.get('origin')&&req.headers.get('origin')!==url.origin&&!['GET','HEAD'].includes(req.method))throw new HttpError(403,'cross_origin_write','Cross-origin writes are not permitted.');
   if(path==='/.well-known/jictemple.json'&&req.method==='GET')return json(discovery(url.origin));
   if(path==='/mcp')return await mcp(req,env);
+  if(path.startsWith('/v1/avatars')||/^\/v1\/scenes\/[a-z0-9-]+\/avatars$/.test(path))return await avatarAPI(req,env,path);
   if(path.startsWith('/v1/scenes'))return await sceneAPI(req,env,path);
   if(path.startsWith('/v1/'))return await api(req,env,path);
   const content=path.match(/^\/content\/([a-z0-9-]+)$/);
