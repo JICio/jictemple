@@ -1,0 +1,231 @@
+{
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "const": "0.1.0-candidate"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "subject": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 300
+    },
+    "purpose": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1000
+    },
+    "resourceTerms": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "digest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "id",
+        "version",
+        "digest"
+      ],
+      "additionalProperties": false
+    },
+    "chainId": {
+      "const": 8453
+    },
+    "router": {
+      "type": "string",
+      "pattern": "^0x[0-9a-fA-F]{40}$"
+    },
+    "routerConfigDigest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "payer": {
+      "type": "string",
+      "pattern": "^0x[0-9a-fA-F]{40}$"
+    },
+    "method": {
+      "enum": [
+        "consumeUsdc",
+        "payUsdc"
+      ]
+    },
+    "recipient": {
+      "type": "string",
+      "pattern": "^0x[0-9a-fA-F]{40}$"
+    },
+    "memo": {
+      "type": "string",
+      "pattern": "^0x[0-9a-fA-F]{64}$"
+    },
+    "usdc": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string",
+          "pattern": "^0x[0-9a-fA-F]{40}$"
+        },
+        "decimals": {
+          "const": 6
+        },
+        "amountUnits": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]*$"
+        }
+      },
+      "required": [
+        "token",
+        "decimals",
+        "amountUnits"
+      ],
+      "additionalProperties": false
+    },
+    "display": {
+      "type": "object",
+      "properties": {
+        "symbol": {
+          "const": "LOVE"
+        },
+        "amount": {
+          "type": "string",
+          "pattern": "^[0-9]+(?:\\.[0-9]+)?$"
+        },
+        "nav": {
+          "type": "string",
+          "pattern": "^[0-9]+(?:\\.[0-9]+)?$"
+        },
+        "quoteId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "quotedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "validUntil": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "symbol",
+        "amount",
+        "nav",
+        "quoteId",
+        "quotedAt",
+        "validUntil"
+      ],
+      "additionalProperties": false
+    },
+    "state": {
+      "enum": [
+        "quoted",
+        "submitted",
+        "observed",
+        "confirmed",
+        "finalized",
+        "failed",
+        "expired"
+      ]
+    },
+    "receipt": {
+      "type": "object",
+      "properties": {
+        "transactionHash": {
+          "type": "string",
+          "pattern": "^0x[0-9a-fA-F]{64}$"
+        },
+        "logIndex": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "blockNumber": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "confirmations": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "transactionHash",
+        "logIndex",
+        "blockNumber",
+        "confirmations"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "id",
+    "subject",
+    "purpose",
+    "resourceTerms",
+    "chainId",
+    "router",
+    "routerConfigDigest",
+    "payer",
+    "method",
+    "memo",
+    "usdc",
+    "display",
+    "state"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jictemple.com/protocol/settlement-intent.schema.json",
+  "title": "JIC Temple Router settlement intent · candidate",
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "method": {
+            "const": "payUsdc"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "recipient"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "state": {
+            "enum": [
+              "observed",
+              "confirmed",
+              "finalized"
+            ]
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "receipt"
+        ]
+      }
+    }
+  ],
+  "description": "只建立意圖，不構成付款授權。支付方法需沿 Router 當次 ABI，且明確使用 USDC 結算。"
+}

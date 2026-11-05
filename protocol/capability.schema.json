@@ -1,0 +1,113 @@
+{
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "const": "0.1.0-candidate"
+    },
+    "iss": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 300
+    },
+    "aud": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 300
+    },
+    "res": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500
+    },
+    "act": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "lim": {
+      "type": "object",
+      "properties": {
+        "maxBytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "maxRequests": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "maxCpuMs": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "nbf": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "exp": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "prf": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        }
+      ]
+    },
+    "nonce": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "signature": {
+      "type": "object",
+      "properties": {
+        "alg": {
+          "const": "Ed25519"
+        },
+        "keyId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "value": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        }
+      },
+      "required": [
+        "alg",
+        "keyId",
+        "value"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "iss",
+    "aud",
+    "res",
+    "act",
+    "lim",
+    "nbf",
+    "exp",
+    "prf",
+    "nonce",
+    "signature"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jictemple.com/protocol/capability.schema.json",
+  "title": "JIC Temple capability · candidate",
+  "description": "格式驗證不代表能力有效。執行時另驗簽、期限、撤銷、授予鏈與降權。"
+}

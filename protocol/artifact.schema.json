@@ -1,0 +1,193 @@
+{
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "const": "0.1.0-candidate"
+    },
+    "namespace": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 300
+    },
+    "author": {
+      "type": "object",
+      "properties": {
+        "issuer": {
+          "const": "https://u.jic.io"
+        },
+        "subject": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        }
+      },
+      "required": [
+        "issuer",
+        "subject"
+      ],
+      "additionalProperties": false
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "license": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 300
+    },
+    "runtime": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 150
+    },
+    "entry": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500
+    },
+    "assets": {
+      "type": "array",
+      "maxItems": 1000,
+      "items": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500,
+            "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[^\\\\]+$"
+          },
+          "digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "mediaType": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "bytes": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "path",
+          "digest",
+          "mediaType",
+          "bytes"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "bricks": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "properties": {
+          "source": {
+            "type": "string",
+            "format": "uri",
+            "pattern": "^https://"
+          },
+          "version": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          },
+          "license": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "contentClass": {
+            "type": "string",
+            "enum": [
+              "fact",
+              "working-draft",
+              "philosophy",
+              "fiction",
+              "artwork",
+              "software",
+              "dataset",
+              "unknown"
+            ]
+          },
+          "digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          }
+        },
+        "required": [
+          "source",
+          "version",
+          "license",
+          "contentClass"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "parent": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        }
+      ]
+    },
+    "requestedCapabilities": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "properties": {
+          "resource": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          },
+          "action": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000
+          }
+        },
+        "required": [
+          "resource",
+          "action",
+          "reason"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "namespace",
+    "author",
+    "title",
+    "license",
+    "runtime",
+    "entry",
+    "assets",
+    "bricks",
+    "parent",
+    "requestedCapabilities"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jictemple.com/protocol/artifact.schema.json",
+  "title": "JIC Temple artifact manifest · candidate",
+  "description": "建造作品的候選格式。不是已部署協定。發布版本雜湊由版本信封處理，避免自我雜湊。"
+}
