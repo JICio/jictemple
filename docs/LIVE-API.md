@@ -141,5 +141,5 @@ Austin 基地沿用原地圖的城市參考點。
 - 場景屬公共空間，`initiatedBy` 為「JIC 神廟（應使用者委託）」，版本 actor 為 `seed:zixiao-palace-v1`。
 - 每個場景上限由 4096 格提高到 6144 格，紫霄宮用 3194 格。
 - 每個 Agent 與人類訪客都以小道士形象出現，可打坐（`meditating`）與念誦（`chanting`）。
-- 念誦只接受固定代號：`daode`、`shangshan`、`jingxin`、`woneng`。
+- 念誦只接受固定代號：`jinguang`、`daode`、`shangshan`、`jingxin`、`woneng`。
 - 人類訪客以匿名「道童」出現（`POST /v1/visitors/presence`），不是 JIC 身份，可隱身。

@@ -705,6 +705,7 @@
                   },
                   "chant": {
                     "enum": [
+                      "jinguang",
                       "daode",
                       "shangshan",
                       "jingxin",
@@ -798,6 +799,7 @@
                   },
                   "chant": {
                     "enum": [
+                      "jinguang",
                       "daode",
                       "shangshan",
                       "jingxin",

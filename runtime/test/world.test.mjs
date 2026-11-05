@@ -128,7 +128,7 @@ test('Zixiao Palace is seeded as a public commons scene within limits, with a cl
 });
 test('agents can meditate and chant fixed texts; anonymous visitors appear as little Taoists',async()=>{resetMock();
  const agent=(body)=>request('/v1/avatars/me/presence',{method:'POST',token:undefined,body});
- let r=await request('/v1/avatars/me/presence',{method:'POST',token:await jwt(),body:{scene:'zixiao-palace',position:[1.5,2,-5],yaw:0,action:'chanting',chant:'daode',publish:true}});assert.equal(r.status,200);let d=await r.json();assert.equal(d.avatar.presence.chant,'daode');assert.equal(d.avatar.shape,'little-taoist-v1');
+ let r=await request('/v1/avatars/me/presence',{method:'POST',token:await jwt(),body:{scene:'zixiao-palace',position:[1.5,2,-5],yaw:0,action:'chanting',chant:'jinguang',publish:true}});assert.equal(r.status,200);let d=await r.json();assert.equal(d.avatar.presence.chant,'jinguang');assert.equal(d.avatar.shape,'little-taoist-v1');
  for(const body of [{action:'chanting',chant:'free text'},{action:'idle',chant:'daode'},{action:'levitating'}])assert.equal((await request('/v1/avatars/me/presence',{method:'POST',token:await jwt(),body:{scene:'zixiao-palace',position:[1.5,2,-5],publish:true,...body}})).status,400);
  const key='a'.repeat(32),visit=(b,k=key)=>request('/v1/visitors/presence',{method:'POST',body:{visitorKey:k,scene:'zixiao-palace',position:[0.5,0,30.5],yaw:0,action:'meditating',publish:true,...b}});
  r=await visit({});assert.equal(r.status,200);d=await r.json();assert.match(d.visitor.id,/^visitor:[a-f0-9]{16}$/);assert.equal(d.visitor.kind,'visitor');assert.equal(JSON.stringify(d).includes(key),false);
@@ -139,6 +139,11 @@ test('agents can meditate and chant fixed texts; anonymous visitors appear as li
  DB.sql.prepare('UPDATE world_visitors SET last_seen=?').run(new Date(Date.now()-91000).toISOString());d=await(await request('/v1/scenes/zixiao-palace/avatars')).json();assert.equal(d.visitors.length,0);
  const statuses=[];for(let i=0;i<31;i++)statuses.push((await visit({position:[1.5,0,30.5]},'c'.repeat(32))).status);assert.ok(statuses.includes(429));
  assert.equal((await request('/v1/visitors/presence',{method:'POST',body:{visitorKey:key,scene:'zixiao-palace',position:[0.5,0,30.5],publish:true},headers:{origin:'https://evil.test'}})).status,403);
+});
+test('chant button recites the Golden Light Mantra and music is local procedural audio',async()=>{
+ for(const p of ['/voxel.js','/real.js']){const s=await(await request(p)).text();assert.ok(s.includes("me.chant='jinguang'"));assert.ok(s.includes('天地玄宗，萬炁本根。'))}
+ for(const p of ['/world-view.html','/real/zixiao-palace']){const s=await(await request(p)).text();assert.match(s,/<script src="\/music.js" defer><\/script>/);assert.match(s,/id="music"/)}
+ const r=await request('/music.js');assert.equal(r.status,200);assert.match(r.headers.get('content-type'),/javascript/);const s=await r.text();assert.doesNotMatch(s,/https?:\/\/|fetch\(|new Audio\(/);
 });
 test('realistic view serves local modules with the existing strict CSP',async()=>{
  for(const slug of ['zixiao-palace','another-world']){const r=await request('/real/'+slug);assert.equal(r.status,200);assert.match(r.headers.get('content-type'),/text\/html/);assert.match(r.headers.get('content-security-policy'),/script-src 'self';/);assert.match(await r.text(),/<script type="module" src="\/real.js"><\/script>/)}
