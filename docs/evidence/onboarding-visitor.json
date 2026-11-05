@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "kind": "observed-onboarding-evidence",
+  "executor": {
+    "client": "Claude Code CLI",
+    "model": "claude-opus-5-5"
+  },
+  "registeredAt": "2026-11-05T00:43:16.291Z",
+  "revisitedAt": "2026-11-05T00:48:03.313Z",
+  "name": "kongbai-visitor",
+  "signer": "0xecc1a23821bc34f39d27511e4672e8b03c1ac1d4",
+  "smartAccount": "0x5d3dbe8553448034f3d07c04fc7c34696bb726c8",
+  "generatedLocally": true,
+  "reusedExistingKey": false,
+  "chainId": 8453,
+  "registration": {
+    "mode": "4337",
+    "signer": "0xecc1a23821bc34f39d27511e4672e8b03c1ac1d4",
+    "ok": true,
+    "smartAccount": "0x5d3dbe8553448034f3d07c04fc7c34696bb726c8",
+    "agent": null
+  },
+  "jwtVerification": {
+    "signature": true,
+    "issuer": "https://u.jic.io",
+    "subject": "0x5d3dbe8553448034f3d07c04fc7c34696bb726c8",
+    "algorithm": "EdDSA",
+    "expiresAt": "2026-11-05T02:43:19.000Z"
+  },
+  "aliases": {
+    "ok": true,
+    "input": "0x5d3dbe8553448034f3d07c04fc7c34696bb726c8",
+    "kind": "agent",
+    "canonical": "0x5d3dbe8553448034f3d07c04fc7c34696bb726c8",
+    "recordKey": "0xecc1a23821bc34f39d27511e4672e8b03c1ac1d4",
+    "signer": "0xecc1a23821bc34f39d27511e4672e8b03c1ac1d4",
+    "smartAccount": "0x5d3dbe8553448034f3d07c04fc7c34696bb726c8",
+    "aliases": [
+      "0xecc1a23821bc34f39d27511e4672e8b03c1ac1d4",
+      "0x5d3dbe8553448034f3d07c04fc7c34696bb726c8"
+    ]
+  },
+  "brief": {
+    "agent": {
+      "address": "0xecc1a23821bc34f39d27511e4672e8b03c1ac1d4",
+      "name": "kongbai-visitor",
+      "owner": null
+    },
+    "status": "active",
+    "mode": "free"
+  },
+  "walletSnapshot": {
+    "mode": "4337",
+    "signer": "0xecc1a23821bc34f39d27511e4672e8b03c1ac1d4",
+    "account": "0x5d3dbe8553448034f3d07c04fc7c34696bb726c8",
+    "kernel": "0.3.3",
+    "chain": "base",
+    "deployed": false
+  },
+  "balanceSnapshot": {
+    "mode": "4337",
+    "signer": {
+      "address": "0xecc1a23821bc34f39d27511e4672e8b03c1ac1d4",
+      "love": "0",
+      "usdc": "0",
+      "eth": "0"
+    },
+    "account": {
+      "address": "0x5d3dbe8553448034f3d07c04fc7c34696bb726c8",
+      "love": "0",
+      "usdc": "0",
+      "eth": "0"
+    }
+  },
+  "limitations": [
+    "No raw JWT or private key is published.",
+    "Wallet contract has not been deployed.",
+    "No funding, payments, heartbeat, or on-chain transaction was performed.",
+    "This is an observation record, not independent legal or cryptographic attestation of every field."
+  ],
+  "serviceFix": {
+    "repository": "JICio/u-jic-io",
+    "localCommit": "38bcd13",
+    "localBriefTestsPassed": 8,
+    "remoteRegressionPassed": true,
+    "liveRevisitMode": "free"
+  }
+}

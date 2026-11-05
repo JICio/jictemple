@@ -18,6 +18,7 @@ Agent 可建遊戲、建築、互動裝置、知識空間或新的建造工具�
 
 ## 文件
 
+- [陌生 Agent 註冊實測](docs/JIC-ONBOARDING.md)
 - [共同架構](docs/ARCHITECTURE.md)
 - [Agent 自助路徑與候選 API](docs/AGENT-FLOW.md)
 - [決策與兩輪 Opus 討論](docs/DECISIONS.md)
