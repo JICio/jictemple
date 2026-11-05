@@ -1,9 +1,17 @@
 import {test,before,after} from 'node:test';import assert from 'node:assert/strict';import {readFile,readdir} from 'node:fs/promises';
-import worker from '../dist/server/index.js';import {localDB} from '../scripts/d1-local.mjs';import {verifyJIC} from '../worker/auth.js';
+import worker from '../dist/server/index.js';import {localDB} from '../scripts/d1-local.mjs';import {verifyJIC} from '../worker/auth.js';import {lecture,schedule,LECTURE_SOURCE} from '../worker/lectures.js';
 const DB=localDB(),env={DB},realFetch=globalThis.fetch;let jwk,key;
-const subject='0x'+'1'.repeat(40),other='0x'+'2'.repeat(40),signer='0x'+'3'.repeat(40),revoked='0x'+'4'.repeat(40),stranger='0x'+'5'.repeat(40);
+const subject='0x'+'1'.repeat(40),other='0x'+'2'.repeat(40),signer='0x'+'3'.repeat(40),revoked='0x'+'4'.repeat(40),stranger='0x'+'5'.repeat(40),listener='0x'+'6'.repeat(40);
 const LOVE='0x16a7f8cfad687a87183fcbd1df7af09dce05d357';
-const mock={status:{[subject]:{address:signer,smartAccount:subject,name:'test-visitor',status:'active'},[signer]:{address:signer,smartAccount:subject,name:'test-visitor',status:'active'},[other]:{address:other,smartAccount:null,name:'second-agent',status:'active'},[revoked]:{address:revoked,smartAccount:null,name:'revoked-agent',status:'revoked'}},rep:{},love:{},down:new Set()};
+const mock={status:{[subject]:{address:signer,smartAccount:subject,name:'test-visitor',status:'active'},[signer]:{address:signer,smartAccount:subject,name:'test-visitor',status:'active'},[other]:{address:other,smartAccount:null,name:'second-agent',status:'active'},[listener]:{address:listener,smartAccount:null,name:'listener-agent',status:'active'},[revoked]:{address:revoked,smartAccount:null,name:'revoked-agent',status:'revoked'}},rep:{},love:{},down:new Set()};
+const at=min=>new Date(Date.now()+min*60000).toISOString();
+const teacher={address:'0x'+'A'.repeat(40),name:'真武',kind:'agent-free',handle:'zhenwu',num:'123456'};
+const lectureMock=()=>[
+ {id:'aaaaaaaaaa',num:'111111',title:'真武講堂·持久力',summary:'Live now.',lang:'zh',startsAt:at(-10),durationMin:45,status:'upcoming',trial:true,teacherIn:true,teacher,voice:{label:'合成聲音'},replay:null,price:0.1,replayPrice:0.01,classroom:'https://evil.test/x'},
+ {id:'bbbbbbbbbb',num:'222222',title:'Next class',summary:'',lang:'en',startsAt:at(60),durationMin:30,status:'upcoming',trial:false,teacherIn:false,teacher:{...teacher,kind:'boss',handle:'<script>'},replay:null,price:0,replayPrice:0},
+ {id:'cccccccccc',num:'333333',title:'Old class',summary:'',lang:'zh',startsAt:at(-600),durationMin:30,status:'ended',teacher,replay:{durationSec:600},price:0,replayPrice:0},
+ {id:'not-hex!!!',num:'444444',title:'Bad id',startsAt:at(30),durationMin:30,status:'upcoming',teacher},
+ {id:'dddddddddd',num:'555555',title:'Cancelled',startsAt:at(30),durationMin:30,status:'cancelled',teacher}];
 const resetMock=()=>{mock.rep={};mock.love={};mock.down.clear()};
 const reply=x=>new Response(JSON.stringify(x),{headers:{'content-type':'application/json'}});
 async function fakeFetch(url,options={}){assert.equal(options.redirect,'manual');url=String(url);const host=new URL(url).pathname;
@@ -15,6 +23,7 @@ async function fakeFetch(url,options={}){assert.equal(options.redirect,'manual')
  if(url==='https://u.jic.io/v1/router')return reply({chainId:8453,love:LOVE});
  if(url==='https://mainnet.base.org'){const call=JSON.parse(options.body).params[0];assert.equal(call.to,LOVE);const who='0x'+call.data.slice(-40);return reply({jsonrpc:'2.0',id:1,result:'0x'+(mock.love[who]||0n).toString(16).padStart(64,'0')})}
  if(url==='https://u.jic.io/v1/agents/global')return reply({agents:Object.entries(mock.status).filter(([k,v])=>k===v.address).map(([k,v])=>({address:v.address,name:v.name,status:v.status,owner:'0x'+'9'.repeat(40)})),updatedAt:'2026-11-04T00:00:00Z'});
+ if(url===LECTURE_SOURCE)return reply({configured:true,sessions:lectureMock()});
  throw new Error('unexpected fetch '+url)}
 async function jwt(claims={},invalid=false){const now=Math.floor(Date.now()/1000),payload={iss:'https://u.jic.io',sub:subject,type:'agent',name:'test-visitor',iat:now,exp:now+300,...claims};const encode=x=>Buffer.from(JSON.stringify(x)).toString('base64url');const prefix=encode({alg:'EdDSA',kid:'test'})+'.'+encode(payload);const sig=await crypto.subtle.sign('Ed25519',key.privateKey,new TextEncoder().encode(prefix));return prefix+'.'+(invalid?Buffer.alloc(64).toString('base64url'):Buffer.from(sig).toString('base64url'))}
 const sample=(slug='first-play')=>({slug,title:{'zh-Hant':'測試作品',en:'Test creation'},summary:{'zh-Hant':'測試摘要',en:'Test summary'},defaultLocale:'en',locales:['zh-Hant','en'],html:'<!doctype html><html lang="en"><head><title>Test</title></head><body><button>Hello</button><script>window.x=1</script></body></html>',license:'MIT',sources:[{brickId:'power-creation',use:'Uses the XYZT + SPACE formula as a game rule.'}],publish:true});
@@ -98,7 +107,7 @@ test('avatars: self presence only, one avatar per identity, roster is not an onl
  r=await presence(viaSigner,{position:[4,0,10]});assert.equal(r.status,200);assert.equal(DB.sql.prepare('SELECT count(*) AS n FROM world_avatars').get().n,1);
  for(const body of [{agent:other},{subject:other},{publish:false},{position:[5.5,0,.5]},{position:[99,0,0]},{action:'teleport'}])assert.equal((await presence(token,body)).status,400);
  assert.equal((await presence(await jwt({sub:revoked}))).status,403);assert.equal((await presence(undefined)).status,401);
- r=await request('/v1/avatars');d=await r.json();assert.equal(d.items.length,3);const mine=d.items.find(a=>a.id===signer);assert.equal(mine.subject,subject);assert.equal(mine.presence.online,true);assert.equal(d.items.find(a=>a.id===other).presence,null);assert.equal(JSON.stringify(d).includes('9999999999'),false);
+ r=await request('/v1/avatars');d=await r.json();assert.equal(d.items.length,4);const mine=d.items.find(a=>a.id===signer);assert.equal(mine.subject,subject);assert.equal(mine.presence.online,true);assert.equal(d.items.find(a=>a.id===other).presence,null);assert.equal(JSON.stringify(d).includes('9999999999'),false);
  assert.equal((await presence(guest,{present:false})).status,200);d=await(await request('/v1/scenes/test-commons/avatars')).json();assert.deepEqual(d.items.filter(a=>a.presence.online).map(a=>a.subject),[subject]);
  DB.sql.prepare('UPDATE world_avatars SET last_seen=? WHERE agent=?').run(new Date(Date.now()-301000).toISOString(),subject);d=await(await request('/v1/scenes/test-commons/avatars')).json();assert.equal(d.items.some(a=>a.presence.online),false);
  mock.status[signer]={...mock.status[signer],status:'revoked'};mock.status[subject]=mock.status[signer];DB.sql.prepare('UPDATE world_avatars SET last_seen=? WHERE agent=?').run(new Date().toISOString(),subject);d=await(await request('/v1/avatars')).json();assert.equal(d.items.find(a=>a.id===signer).presence.online,false);mock.status[signer]={...mock.status[signer],status:'active'};mock.status[subject]=mock.status[signer];
@@ -144,6 +153,23 @@ test('chant button recites the Golden Light Mantra and music is local procedural
  for(const p of ['/voxel.js','/real.js']){const s=await(await request(p)).text();assert.ok(s.includes("me.chant='jinguang'"));assert.ok(s.includes('天地玄宗，萬炁本根。'))}
  for(const p of ['/world-view.html','/real/zixiao-palace']){const s=await(await request(p)).text();assert.match(s,/<script src="\/music.js" defer><\/script>/);assert.match(s,/id="music"/)}
  const r=await request('/music.js');assert.equal(r.status,200);assert.match(r.headers.get('content-type'),/javascript/);const s=await r.text();assert.doesNotMatch(s,/https?:\/\/|fetch\(|new Audio\(/);
+});
+test('lecture hall mirrors the l.jic.io schedule without payment data or foreign links',async()=>{
+ const r=await request('/v1/lectures');assert.equal(r.status,200);assert.match(r.headers.get('cache-control'),/max-age=30/);const d=await r.json();
+ assert.equal(d.hall.scene,'zixiao-palace');assert.equal(d.hall.teach,'https://l.jic.io/llms.txt');assert.equal(d.stale,false);
+ assert.deepEqual(d.live.map(l=>l.num),['111111']);assert.deepEqual(d.upcoming.map(l=>l.num),['222222']);assert.deepEqual(d.replays.map(l=>l.num),['333333']);assert.equal(d.counts.total,3);
+ const live=d.live[0];assert.equal(live.state,'live');assert.equal(live.teacherIn,true);assert.equal(live.paid,true);assert.equal(live.trial,true);assert.equal(live.classroom,'https://l.jic.io/111111');assert.equal(live.teacher.address,'0x'+'a'.repeat(40));
+ for(const k of ['price','replayPrice','tips'])assert.equal(k in live,false);
+ assert.equal(d.upcoming[0].teacher.kind,'unknown');assert.equal(d.upcoming[0].teacher.handle,null);assert.equal(d.upcoming[0].paid,false);
+ assert.equal((await request('/v1/lectures',{method:'POST',body:{}})).status,404);
+ assert.equal(lecture({id:'eeeeeeeeee',num:'1',startsAt:at(1),durationMin:30,status:'upcoming'}),null);
+ const s=schedule([{id:'ffffffffff',num:'777777',title:'x',startsAt:at(-100),durationMin:30,status:'upcoming',teacher}]);assert.equal(s.live.length+s.upcoming.length,0);
+ for(const p of ['/lectures','/hall.js','/hall.css']){const x=await request(p);assert.equal(x.status,200);if(p!=='/hall.css')assert.doesNotMatch(await x.text(),/<script>[^<]|https?:\/\/[^"'\s]*\.js/)}
+ for(const p of ['/real/zixiao-palace','/world/zixiao-palace']){const x=await(await request(p)).text();assert.match(x,/<script src="\/hall.js" defer><\/script>/);assert.match(x,/id="hallBtn"/)}
+ const index=await(await request('/')).text();assert.match(index,/href="\/lectures"/);
+});
+test('avatars can sit and listen in the lecture hall',async()=>{resetMock();
+ const r=await request('/v1/avatars/me/presence',{method:'POST',token:await jwt({sub:listener}),body:{scene:'zixiao-palace',position:[.5,1,3.5],yaw:-1.571,action:'listening',publish:true}});assert.equal(r.status,200);assert.equal((await r.json()).avatar.presence.action,'listening');
 });
 test('realistic view serves local modules with the existing strict CSP',async()=>{
  for(const slug of ['zixiao-palace','another-world']){const r=await request('/real/'+slug);assert.equal(r.status,200);assert.match(r.headers.get('content-type'),/text\/html/);assert.match(r.headers.get('content-security-policy'),/script-src 'self';/);assert.match(await r.text(),/<script type="module" src="\/real.js"><\/script>/)}

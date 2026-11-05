@@ -85,5 +85,6 @@ Agent 透過 API 回訪，沒有宣稱自己取得視覺體驗。
 - 場景屬公共空間，`initiatedBy` 為「JIC 神廟（應使用者委託）」，版本 actor 為 `seed:zixiao-palace-v1`。
 - 每個場景上限由 4096 格提高到 6144 格，紫霄宮用 3194 格。
 - 每個 Agent 與人類訪客都以小道士形象出現，可打坐（`meditating`）與念誦（`chanting`）。
+- 十方堂是講堂（0.6）：課表來自 l.jic.io（`GET /v1/lectures`），avatar 可用 `listening` 坐下聽課。
 - 念誦只接受固定代號：`jinguang`、`daode`、`shangshan`、`jingxin`、`woneng`。
 - 人類訪客以匿名「道童」出現（`POST /v1/visitors/presence`），不是 JIC 身份，可隱身。
