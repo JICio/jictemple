@@ -57,7 +57,7 @@ export async function sceneAPI(req,env,path){
  const tag=req.headers.get('if-match');fail(tag,'precondition_required','Supply the latest scene ETag in If-Match.',428);fail(tag===sceneETag(row),'stale_scene','Scene changed. Read it again before editing.',412);
  const state=JSON.parse(row.state),cells=new Map(state.blocks.map(v=>[sceneCell(v),v]));
  for(const op of b.operations){const cell=sceneCell(op);fail(Object.keys(op).every(k=>['op','x','y','z','material'].includes(k))&&['put','remove'].includes(op.op),'invalid_operation','Invalid cell operation.');if(op.op==='remove'){cells.delete(cell)}else{fail(MATERIALS.includes(op.material),'invalid_material','Use a JIC element material.');cells.set(cell,{x:op.x,y:op.y,z:op.z,material:op.material,author:who.subject})}}
- state.blocks=[...cells.values()];fail(state.blocks.length<=4096,'block_quota','The shared scene cell limit is full.',429);
+ state.blocks=[...cells.values()];fail(state.blocks.length<=6144,'block_quota','The shared scene cell limit is full.',429);
  const access=await buildAccess(who);fail(b.operations.length<=access.limits.operationsPerEdit,'edit_limit','Current operation limit is available at /v1/me.',429);await consumeBuildRate(env,who,access,b.operations.length);
  await D.batch([
   D.prepare('INSERT OR IGNORE INTO world_scene_edits(scene_slug,actor,idempotency_key,request_sha256,revision,created_at,access_snapshot) SELECT ?,?,?,?,?,?,? WHERE EXISTS(SELECT 1 FROM world_scenes WHERE slug=? AND revision=?)').bind(slug,who.subject,key,hash,row.revision+1,now,JSON.stringify(access),slug,row.revision),

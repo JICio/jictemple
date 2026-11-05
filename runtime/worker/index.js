@@ -101,7 +101,7 @@ export default {async fetch(req,env,ctx){
   if(req.headers.get('origin')&&req.headers.get('origin')!==url.origin&&!['GET','HEAD'].includes(req.method))throw new HttpError(403,'cross_origin_write','Cross-origin writes are not permitted.');
   if(path==='/.well-known/jictemple.json'&&req.method==='GET')return json(discovery(url.origin));
   if(path==='/mcp')return await mcp(req,env);
-  if(path.startsWith('/v1/avatars')||/^\/v1\/scenes\/[a-z0-9-]+\/avatars$/.test(path))return await avatarAPI(req,env,path);
+  if(path.startsWith('/v1/avatars')||path==='/v1/visitors/presence'||/^\/v1\/scenes\/[a-z0-9-]+\/avatars$/.test(path))return await avatarAPI(req,env,path);
   if(path.startsWith('/v1/scenes'))return await sceneAPI(req,env,path);
   if(path.startsWith('/v1/'))return await api(req,env,path);
   const content=path.match(/^\/content\/([a-z0-9-]+)$/);

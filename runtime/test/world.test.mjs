@@ -117,3 +117,25 @@ test('built pages carry the JIC 神廟 name and no scene ownership UI',async()=>
  for(const path of ['/voxel.js','/world.js']){const s=await(await request(path)).text();assert.doesNotMatch(s,/\.owner\b/)}
  assert.match((await request('/avatars')).headers.get('content-security-policy'),/img-src 'self' data: https:\/\/u\.jic\.io/);
 });
+test('Zixiao Palace is seeded as a public commons scene within limits, with a clear spawn',async()=>{
+ const r=await request('/v1/scenes/zixiao-palace');assert.equal(r.status,200);const d=await r.json();
+ assert.equal(d.ownership,'public-commons');assert.ok(d.blocks.length>2500&&d.blocks.length<=6144);assert.equal(d.landmarks.length,8);assert.equal(d.geographicAnchor.precision,'city-reference');
+ assert.ok(d.blocks.every(b=>['LOVE','WISH','TIME','SPACE','XYZT'].includes(b.material)&&b.author==='seed:zixiao-palace-v1'));
+ const [sx,sy,sz]=d.spawn;assert.equal(d.blocks.some(b=>b.x+1>sx-.24&&b.x<sx+.24&&b.z+1>sz-.24&&b.z<sz+.24&&b.y+1>sy-1.65&&b.y<sy),false);
+ assert.deepEqual((await(await request('/v1/scenes/zixiao-palace/revisions')).json()).items.map(x=>x.actor),['seed:zixiao-palace-v1']);
+ resetMock();const tag=r.headers.get('etag');const e=await request('/v1/scenes/zixiao-palace/edits',{method:'POST',token:await jwt({sub:other}),body:{dataLicense:'CC0-1.0',operations:[{op:'put',x:0,y:3,z:-5,material:'LOVE'}]},key:'zixiao-edit-001',headers:{'if-match':tag}});assert.equal(e.status,200);
+});
+test('agents can meditate and chant fixed texts; anonymous visitors appear as little Taoists',async()=>{resetMock();
+ const agent=(body)=>request('/v1/avatars/me/presence',{method:'POST',token:undefined,body});
+ let r=await request('/v1/avatars/me/presence',{method:'POST',token:await jwt(),body:{scene:'zixiao-palace',position:[1.5,2,-5],yaw:0,action:'chanting',chant:'daode',publish:true}});assert.equal(r.status,200);let d=await r.json();assert.equal(d.avatar.presence.chant,'daode');assert.equal(d.avatar.shape,'little-taoist-v1');
+ for(const body of [{action:'chanting',chant:'free text'},{action:'idle',chant:'daode'},{action:'levitating'}])assert.equal((await request('/v1/avatars/me/presence',{method:'POST',token:await jwt(),body:{scene:'zixiao-palace',position:[1.5,2,-5],publish:true,...body}})).status,400);
+ const key='a'.repeat(32),visit=(b,k=key)=>request('/v1/visitors/presence',{method:'POST',body:{visitorKey:k,scene:'zixiao-palace',position:[0.5,0,30.5],yaw:0,action:'meditating',publish:true,...b}});
+ r=await visit({});assert.equal(r.status,200);d=await r.json();assert.match(d.visitor.id,/^visitor:[a-f0-9]{16}$/);assert.equal(d.visitor.kind,'visitor');assert.equal(JSON.stringify(d).includes(key),false);
+ assert.equal((await visit({},'short')).status,400);assert.equal((await visit({agent:other})).status,400);assert.equal((await visit({position:[0,0,-5.5]})).status,400);
+ assert.equal((await visit({},'b'.repeat(32))).status,200);
+ d=await(await request('/v1/scenes/zixiao-palace/avatars')).json();assert.equal(d.visitors.length,2);assert.equal(d.items[0].presence.action,'chanting');
+ assert.equal((await visit({present:false})).status,200);d=await(await request('/v1/scenes/zixiao-palace/avatars')).json();assert.equal(d.visitors.filter(v=>v.presence.online).length,1);
+ DB.sql.prepare('UPDATE world_visitors SET last_seen=?').run(new Date(Date.now()-91000).toISOString());d=await(await request('/v1/scenes/zixiao-palace/avatars')).json();assert.equal(d.visitors.length,0);
+ const statuses=[];for(let i=0;i<31;i++)statuses.push((await visit({position:[1.5,0,30.5]},'c'.repeat(32))).status);assert.ok(statuses.includes(429));
+ assert.equal((await request('/v1/visitors/presence',{method:'POST',body:{visitorKey:key,scene:'zixiao-palace',position:[0.5,0,30.5],publish:true},headers:{origin:'https://evil.test'}})).status,403);
+});

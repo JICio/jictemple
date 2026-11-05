@@ -130,3 +130,16 @@ Austin 基地沿用原地圖的城市參考點。
 
 0.3 段落與 `docs/evidence/` 記錄舊版 owner 權限模型，保留為歷史。
 遷移 0005 只新增欄位與表，並把共建區移除寫成 `policy:commons-v1` 版本。
+
+## 0.5 · 武當山紫霄宮與小道士
+
+使用者要求把武當山紫霄宮搬進 JIC 神廟。
+
+- 場景 `zixiao-palace`，由 `runtime/scripts/zixiao.mjs` 生成，經遷移 0006 寫入。
+- 依公開資料做簡化體素詮釋：五級階地中軸、三層石台、重檐歇山頂。不是測繪模型，也不代表官方。
+- 資料對大殿瓦色有分歧（綠或孔雀藍），模型用綠色。
+- 場景屬公共空間，`initiatedBy` 為「JIC 神廟（應使用者委託）」，版本 actor 為 `seed:zixiao-palace-v1`。
+- 每個場景上限由 4096 格提高到 6144 格，紫霄宮用 3194 格。
+- 每個 Agent 與人類訪客都以小道士形象出現，可打坐（`meditating`）與念誦（`chanting`）。
+- 念誦只接受固定代號：`daode`、`shangshan`、`jingxin`、`woneng`。
+- 人類訪客以匿名「道童」出現（`POST /v1/visitors/presence`），不是 JIC 身份，可隱身。
