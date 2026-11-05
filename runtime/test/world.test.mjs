@@ -180,7 +180,8 @@ test('realistic view serves local modules with the existing strict CSP',async()=
 });
 test('realistic foot collision and stepped walking agree with server validation',async()=>{resetMock();
  const src=await readFile('public/real.js','utf8'),d=await(await request('/v1/scenes/zixiao-palace')).json(),cells=new Map(d.blocks.map(b=>[`${b.x},${b.y},${b.z}`,b]));
- const free=new Function('cells',src.slice(src.indexOf('function free('),src.indexOf('function physics('))+';return free')(cells);
+ const hallSolids=new Function(src.slice(src.indexOf('const HALL_SOLID_COLUMNS='),src.indexOf('function cameraBlocked('))+';return hallSolids')();
+ const free=new Function('cells','hallSolids',src.slice(src.indexOf('function free('),src.indexOf('function physics('))+';return free')(cells,hallSolids);
  for(const [x,y,z,expected] of [[.5,0,30.5,true],[.5,2,26.5,true],[.5,0,26.5,false],[3,1,7,true],[3,2,-4,true],[8,3,-27,true],[0,5,-11.5,true],[-4.5,5,-15,false],[0,0,32,false]]){assert.equal(free(x,y,z),expected,JSON.stringify([x,y,z]));if(expected){const r=await request('/v1/visitors/presence',{method:'POST',body:{visitorKey:'d'.repeat(32),scene:'zixiao-palace',position:[x,y,z],yaw:0,action:'idle',publish:true}});assert.equal(r.status,200,JSON.stringify([x,y,z]))}}
  // Simulate approach to the first terrace with the actual movement function.
  const simulate=new Function('free',`let data={},mode='third',pos=[7.5,0,10],yaw=0,vy=0,grounded=true,joy=[0,0];const keys=new Set(['KeyW']),me={action:'idle'};function ui(){};${src.slice(src.indexOf('function physics('),src.indexOf('let reporting=false;'))};for(let i=0;i<90;i++){physics(1/60);if(!free(...pos))throw Error('Movement entered solid space')}return pos;`);
@@ -188,4 +189,36 @@ test('realistic foot collision and stepped walking agree with server validation'
  const accepted=await request('/v1/visitors/presence',{method:'POST',body:{visitorKey:'e'.repeat(32),scene:'zixiao-palace',position:walked,yaw:0,action:'idle',publish:true}});assert.equal(accepted.status,200);
  // An edit in a previously clear location immediately becomes collision geometry.
  cells.set('0,0,30',{x:0,y:0,z:30});assert.equal(free(.5,0,30.5),false);
+});
+
+// Execute the real client collision functions against the unchanged seed scene.
+async function mainHallCollision(){
+ const src=await readFile('public/real.js','utf8'),d=await(await request('/v1/scenes/zixiao-palace')).json(),cells=new Map(d.blocks.map(b=>[`${b.x},${b.y},${b.z}`,b]));
+ const hallSolids=new Function(src.slice(src.indexOf('const HALL_SOLID_COLUMNS='),src.indexOf('function cameraBlocked('))+';return hallSolids')();
+ const free=new Function('cells','hallSolids',src.slice(src.indexOf('function free('),src.indexOf('function physics('))+';return free')(cells,hallSolids);
+ const cameraBlocked=new Function('cells','hallSolids',src.slice(src.indexOf('function cameraBlocked('),src.indexOf('const hallLights='))+';return cameraBlocked')(cells,hallSolids);
+ const serverFree=new Function('cells','hallSolids',src.slice(src.indexOf('function free('),src.indexOf('function physics('))+';return free')(cells,new Set());
+ return {src,cells,hallSolids,free,cameraBlocked,serverFree};
+}
+test('main hall furniture stays inside the hall and leaves both axis doors open',async()=>{
+ const {hallSolids,free}=await mainHallCollision();assert.ok(hallSolids.size>0);
+ for(const key of hallSolids){const [x,y,z]=key.split(',').map(Number);assert.ok(x>=-4&&x<=4&&z>=-17&&z<=-13&&y>=5&&y<=9,key);assert.equal(free(x+.5,y,z+.5),false,key)}
+ for(const z of [-18,-12])for(let x=-1;x<=1;x++)for(let y=5;y<=7;y++)assert.equal(hallSolids.has(`${x},${y},${z}`),false);
+ for(const z of [-17.5,-11.5])for(const x of [-.5,.5,1.5])assert.equal(free(x,5,z),true,JSON.stringify([x,z]));
+});
+test('south door route to all three cushions is clear on client and server',async()=>{
+ resetMock();const {free,serverFree,hallSolids}=await mainHallCollision();
+ // Sample the nave with the full avatar footprint, including routes to each cushion.
+ for(const target of [-1,0,1])for(let i=0;i<=60;i++){const t=i/60,p=[.5+(target-.5)*t,5,-11.5-3*t];assert.equal(free(...p),true,JSON.stringify(p));assert.equal(serverFree(...p),true,JSON.stringify(p));for(const key of hallSolids){const [x,,z]=key.split(',').map(Number);assert.ok(!(x<p[0]+.25&&x+1>p[0]-.25&&z<p[2]+.25&&z+1>p[2]-.25),key)}}
+ for(const x of [-1,0,1]){const r=await request('/v1/visitors/presence',{method:'POST',body:{visitorKey:'f'.repeat(32),scene:'zixiao-palace',position:[x,5,-14.5],yaw:0,action:'meditating',publish:true}});assert.equal(r.status,200)}
+ // Side aisles around the columns remain usable.
+ for(const p of [[-3.5,5,-14.5],[2.5,5,-14.5],[-1.5,5,-15.5]])assert.equal(free(...p),true,JSON.stringify(p));
+});
+test('main hall furniture and ceiling block the camera; indoor first person preserves the selected mode',async()=>{
+ const {src,cameraBlocked}=await mainHallCollision();
+ for(const p of [[-2.5,7,-13.5],[.5,5.8,-15.5],[.5,9.95,-14.5]])assert.equal(cameraBlocked(...p),true);
+ assert.equal(cameraBlocked(.5,6.55,-14.5),false);
+ const inside=new Function(src.slice(src.indexOf('const inMainHall='),src.indexOf('const pick='))+';return inMainHall')();
+ const selected='third';for(const [p,expected] of [[[.5,5,-11.4],'first'],[[.5,5,-14.5],'first'],[[.5,5,-10.5],'third']])assert.equal(inside(...p)?'first':selected,expected);
+ assert.match(src,/const viewMode=inMainHall\(\.\.\.pos\)\?'first':mode/);assert.match(src,/self.visible=viewMode==='third'/);
 });
