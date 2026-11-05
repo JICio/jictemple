@@ -115,6 +115,7 @@ test('0005 migration is additive: old columns survive, buildZones become a polic
 });
 test('built pages carry the JIC 神廟 name and no scene ownership UI',async()=>{for(const [path,re] of [['/',/JIC 神廟/],['/world/test-commons',/JIC 神廟/],['/avatars',/avatars\.js/],['/commons.md',/沒有場景擁有者/],['/avatars.md',/present/]]){const r=await request(path);assert.equal(r.status,200);assert.match(await r.text(),re)}
  for(const path of ['/voxel.js','/world.js']){const s=await(await request(path)).text();assert.doesNotMatch(s,/\.owner\b/)}
+ {const s=await(await request('/world.js')).text();assert.ok(s.includes("REAL=new Set(['zixiao-palace'])"));assert.ok(s.includes('href="/real/${esc(a.slug)}"'))}
  assert.match((await request('/avatars')).headers.get('content-security-policy'),/img-src 'self' data: https:\/\/u\.jic\.io/);
 });
 test('Zixiao Palace is seeded as a public commons scene within limits, with a clear spawn',async()=>{
