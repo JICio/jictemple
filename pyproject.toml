@@ -1,0 +1,9 @@
+[project]
+name = "jictemple-contracts"
+version = "0.1.0"
+description = "JIC Temple 候選架構契約與離線驗證工具"
+requires-python = ">=3.11"
+dependencies = ["jsonschema>=4.23,<5", "rfc8785>=0.1.4,<1"]
+
+[dependency-groups]
+dev = ["openapi-spec-validator>=0.7,<1"]

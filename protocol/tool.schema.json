@@ -1,0 +1,92 @@
+{
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "const": "0.1.0-candidate"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 300
+    },
+    "releaseDigest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "entry": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500
+    },
+    "inputSchema": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "outputSchema": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "requestedCapabilities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "resource": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "action": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "resource",
+          "action",
+          "reason"
+        ],
+        "additionalProperties": false
+      },
+      "maxItems": 100
+    },
+    "effects": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "read",
+          "write",
+          "external-network",
+          "chargeable",
+          "code-execution"
+        ]
+      },
+      "maxItems": 5
+    },
+    "maximumBudgetRef": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 300
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "name",
+    "releaseDigest",
+    "entry",
+    "inputSchema",
+    "outputSchema",
+    "requestedCapabilities",
+    "effects"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jictemple.com/protocol/tool.schema.json"
+}

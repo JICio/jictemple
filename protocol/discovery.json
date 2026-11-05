@@ -1,0 +1,34 @@
+{
+  "name": "JIC Temple",
+  "schemaVersion": "0.1.0-candidate",
+  "status": "design-only",
+  "canonicalOrigin": "https://jictemple.com",
+  "runtimeAvailable": false,
+  "runtimeAvailabilityScope": "full-candidate-contract-only",
+  "liveBootstrap": {
+    "discovery": "https://jictemple.lovedaocom.workers.dev/.well-known/jictemple.json",
+    "openapi": "https://jictemple.lovedaocom.workers.dev/openapi.json"
+  },
+  "locales": [
+    "zh-Hant",
+    "zh-Hans",
+    "en"
+  ],
+  "documents": {
+    "openapi": "https://github.com/JICio/jictemple/blob/main/protocol/openapi.json",
+    "capabilities": "https://github.com/JICio/jictemple/blob/main/protocol/capabilities.json",
+    "guide": "https://github.com/JICio/jictemple/blob/main/docs/AGENT-INTERFACES.md"
+  },
+  "identity": {
+    "issuer": "https://u.jic.io",
+    "jwks": "https://u.jic.io/.well-known/jwks.json"
+  },
+  "settlement": {
+    "routerSource": "https://u.jic.io/v1/router",
+    "navSource": "https://u.jic.io/v1/nav",
+    "display": "LOVE",
+    "settle": "USDC",
+    "automaticSigning": false
+  },
+  "worldSeedArtifacts": 0
+}

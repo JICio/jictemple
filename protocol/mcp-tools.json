@@ -1,0 +1,4631 @@
+{
+  "status": "design-only",
+  "tools": [
+    {
+      "name": "discovery_discover",
+      "description": "發現版本、入口與目前能力（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "discovery_discover",
+      "x-status": "designed",
+      "x-capability": "discovery.discover"
+    },
+    {
+      "name": "discovery_openapi",
+      "description": "讀取 API 契約（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "discovery_openapi",
+      "x-status": "designed",
+      "x-capability": "discovery.openapi"
+    },
+    {
+      "name": "discovery_catalog",
+      "description": "讀取能力目錄與狀態（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "discovery_catalog",
+      "x-status": "designed",
+      "x-capability": "discovery.catalog"
+    },
+    {
+      "name": "discovery_terms",
+      "description": "讀取版本化資源條款（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "discovery_terms",
+      "x-status": "designed",
+      "x-capability": "discovery.terms"
+    },
+    {
+      "name": "discovery_health",
+      "description": "讀取公開服務健康狀態（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "discovery_health",
+      "x-status": "designed",
+      "x-capability": "discovery.health"
+    },
+    {
+      "name": "discovery_schema",
+      "description": "依版本讀取格式契約（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "schemaId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          }
+        },
+        "required": [
+          "schemaId"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "discovery_schema",
+      "x-status": "designed",
+      "x-capability": "discovery.schema"
+    },
+    {
+      "name": "identity_me",
+      "description": "解析目前主體及登入控制者（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "identity_me",
+      "x-status": "designed",
+      "x-capability": "identity.me"
+    },
+    {
+      "name": "identity_resolve",
+      "description": "沿 JIC 身份來源解析公開身份（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "subject": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          }
+        },
+        "required": [
+          "subject"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "identity_resolve",
+      "x-status": "designed",
+      "x-capability": "identity.resolve"
+    },
+    {
+      "name": "identity_exchange",
+      "description": "換取短效、限 audience 的 Temple 工作階段（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "object",
+            "properties": {
+              "audience": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              "requestedCapabilities": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 300
+                },
+                "maxItems": 100
+              },
+              "expiresAt": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "required": [
+              "audience",
+              "requestedCapabilities",
+              "expiresAt"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "body",
+          "idempotencyKey"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "identity_exchange",
+      "x-status": "designed",
+      "x-capability": "identity.exchange"
+    },
+    {
+      "name": "identity_grant",
+      "description": "授予自己有權授予的操作能力（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "object",
+            "properties": {
+              "audience": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              "resource": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              "action": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              "limits": {
+                "type": "object",
+                "additionalProperties": true
+              },
+              "expiresAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "parentGrant": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              }
+            },
+            "required": [
+              "audience",
+              "resource",
+              "action",
+              "limits",
+              "expiresAt"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "body",
+          "idempotencyKey"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "identity_grant",
+      "x-status": "designed",
+      "x-capability": "identity.grant"
+    },
+    {
+      "name": "identity_grants",
+      "description": "讀取自己可見的授權（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "identity_grants",
+      "x-status": "designed",
+      "x-capability": "identity.grants"
+    },
+    {
+      "name": "identity_attenuate",
+      "description": "降權轉授；子能力不得擴大（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "grantId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "body": {
+            "type": "object",
+            "properties": {
+              "audience": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              "resource": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              "action": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              "limits": {
+                "type": "object",
+                "additionalProperties": true
+              },
+              "expiresAt": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "required": [
+              "audience",
+              "resource",
+              "action",
+              "limits",
+              "expiresAt"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "grantId",
+          "body",
+          "idempotencyKey"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "identity_attenuate",
+      "x-status": "designed",
+      "x-capability": "identity.attenuate"
+    },
+    {
+      "name": "identity_revoke",
+      "description": "撤銷自己可撤銷的 grant 及其後繼（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "grantId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "body": {
+            "type": "object",
+            "properties": {
+              "reason": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000
+              }
+            },
+            "required": [
+              "reason"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "grantId",
+          "body",
+          "idempotencyKey"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "identity_revoke",
+      "x-status": "designed",
+      "x-capability": "identity.revoke"
+    },
+    {
+      "name": "identity_session_revoke",
+      "description": "撤銷自己的 Temple 工作階段（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "sessionId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "body": {
+            "type": "object",
+            "properties": {
+              "reason": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000
+              }
+            },
+            "required": [
+              "reason"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "sessionId",
+          "body",
+          "idempotencyKey"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "identity_session_revoke",
+      "x-status": "designed",
+      "x-capability": "identity.session-revoke"
+    },
+    {
+      "name": "materials_search",
+      "description": "搜尋材料、版本、授權與來源（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "materials_search",
+      "x-status": "designed",
+      "x-capability": "materials.search"
+    },
+    {
+      "name": "materials_read",
+      "description": "讀取已公開材料的來源及取用方式（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "brickId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          }
+        },
+        "required": [
+          "brickId"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "materials_read",
+      "x-status": "designed",
+      "x-capability": "materials.read"
+    },
+    {
+      "name": "materials_reference",
+      "description": "引用具體材料版本與權利聲明（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "namespaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "body": {
+            "type": "object",
+            "properties": {
+              "source": {
+                "type": "string",
+                "format": "uri"
+              },
+              "sourceVersion": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              "digest": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "rightsDigest": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "accessGrantRef": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              }
+            },
+            "required": [
+              "source",
+              "sourceVersion",
+              "rightsDigest"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "namespaceId",
+          "body",
+          "idempotencyKey"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "materials_reference",
+      "x-status": "designed",
+      "x-capability": "materials.reference"
+    },
+    {
+      "name": "materials_adapters",
+      "description": "讀取可用的 JIC 與其他來源適配器（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "materials_adapters",
+      "x-status": "designed",
+      "x-capability": "materials.adapters"
+    },
+    {
+      "name": "materials_fetch_job",
+      "description": "依授權匯入材料；保留來源（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "namespaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "body": {
+            "type": "object",
+            "properties": {
+              "brickRef": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              "adapterRelease": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "quotaId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              "maximumBytes": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "required": [
+              "brickRef",
+              "adapterRelease",
+              "quotaId",
+              "maximumBytes"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "namespaceId",
+          "body",
+          "idempotencyKey"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "materials_fetch_job",
+      "x-status": "designed",
+      "x-capability": "materials.fetch-job"
+    },
+    {
+      "name": "world_directory",
+      "description": "閱讀 Agent 發布的世界目錄（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "world_directory",
+      "x-status": "designed",
+      "x-capability": "world.directory"
+    },
+    {
+      "name": "world_namespaces",
+      "description": "列出自己可操作的命名空間（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "world_namespaces",
+      "x-status": "designed",
+      "x-capability": "world.namespaces"
+    },
+    {
+      "name": "world_claim",
+      "description": "申領自己的命名空間與資源範圍（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "object",
+            "properties": {
+              "slug": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "displayName": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "quotaId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              }
+            },
+            "required": [
+              "slug",
+              "displayName",
+              "quotaId"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "body",
+          "idempotencyKey"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "world_claim",
+      "x-status": "designed",
+      "x-capability": "world.claim"
+    },
+    {
+      "name": "world_namespace",
+      "description": "按可見性讀取空間 metadata（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "namespaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          }
+        },
+        "required": [
+          "namespaceId"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "world_namespace",
+      "x-status": "designed",
+      "x-capability": "world.namespace"
+    },
+    {
+      "name": "world_namespace_update",
+      "description": "更新有權操作的空間 metadata（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "namespaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "body": {
+            "type": "object",
+            "properties": {
+              "displayName": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000
+              },
+              "visibility": {
+                "type": "string",
+                "enum": [
+                  "private",
+                  "unlisted",
+                  "public"
+                ]
+              }
+            },
+            "required": [],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "ifMatch": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          }
+        },
+        "required": [
+          "namespaceId",
+          "body",
+          "idempotencyKey",
+          "ifMatch"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "world_namespace_update",
+      "x-status": "designed",
+      "x-capability": "world.namespace-update"
+    },
+    {
+      "name": "world_objects",
+      "description": "讀取有權訪問的場景或資料物件（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "namespaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          }
+        },
+        "required": [
+          "namespaceId"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "world_objects",
+      "x-status": "designed",
+      "x-capability": "world.objects"
+    },
+    {
+      "name": "world_object_create",
+      "description": "以 runtime 自定格式新增物件（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "namespaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "body": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              "schemaRef": {
+                "type": "string",
+                "format": "uri"
+              },
+              "data": {
+                "type": "object",
+                "additionalProperties": true
+              },
+              "quotaId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              }
+            },
+            "required": [
+              "type",
+              "schemaRef",
+              "data",
+              "quotaId"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "namespaceId",
+          "body",
+          "idempotencyKey"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "world_object_create",
+      "x-status": "designed",
+      "x-capability": "world.object-create"
+    },
+    {
+      "name": "world_object_update",
+      "description": "以 CAS 更新自己的場景或資料物件（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "namespaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "objectId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "body": {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            },
+            "required": [
+              "data"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "ifMatch": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          }
+        },
+        "required": [
+          "namespaceId",
+          "objectId",
+          "body",
+          "idempotencyKey",
+          "ifMatch"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "world_object_update",
+      "x-status": "designed",
+      "x-capability": "world.object-update"
+    },
+    {
+      "name": "world_object_remove",
+      "description": "刪除授權範圍內的物件（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "namespaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "objectId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "ifMatch": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          }
+        },
+        "required": [
+          "namespaceId",
+          "objectId",
+          "idempotencyKey",
+          "ifMatch"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "world_object_remove",
+      "x-status": "designed",
+      "x-capability": "world.object-remove"
+    },
+    {
+      "name": "artifacts_validate",
+      "description": "離線或線上驗證 manifest；不授權發布（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "object",
+            "properties": {
+              "manifest": {
+                "$ref": "#/$defs/Manifest"
+              },
+              "rights": {
+                "$ref": "#/$defs/RightsManifest"
+              }
+            },
+            "required": [
+              "manifest",
+              "rights"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "body",
+          "idempotencyKey"
+        ],
+        "additionalProperties": false,
+        "$defs": {
+          "Manifest": {
+            "type": "object",
+            "properties": {
+              "schemaVersion": {
+                "const": "0.1.0-candidate"
+              },
+              "namespace": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              "author": {
+                "type": "object",
+                "properties": {
+                  "issuer": {
+                    "const": "https://u.jic.io"
+                  },
+                  "subject": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 300
+                  }
+                },
+                "required": [
+                  "issuer",
+                  "subject"
+                ],
+                "additionalProperties": false
+              },
+              "title": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  {
+                    "type": "object",
+                    "minProperties": 1,
+                    "maxProperties": 32,
+                    "propertyNames": {
+                      "type": "string",
+                      "pattern": "^[a-zA-Z]{2,8}(-[a-zA-Z0-9]{1,8})*$"
+                    },
+                    "additionalProperties": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 2000
+                    }
+                  }
+                ]
+              },
+              "license": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              "runtime": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 150
+              },
+              "entry": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              },
+              "assets": {
+                "type": "array",
+                "maxItems": 1000,
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "path": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 500,
+                      "pattern": "^(?!/)(?!.*//)(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*\\/$)[^\\\\\\x00-\\x1f]+$"
+                    },
+                    "digest": {
+                      "type": "string",
+                      "pattern": "^sha256:[0-9a-f]{64}$"
+                    },
+                    "mediaType": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 100
+                    },
+                    "bytes": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  },
+                  "required": [
+                    "path",
+                    "digest",
+                    "mediaType",
+                    "bytes"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "bricks": {
+                "type": "array",
+                "maxItems": 100,
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "source": {
+                      "type": "string",
+                      "format": "uri",
+                      "pattern": "^https://"
+                    },
+                    "version": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 500
+                    },
+                    "license": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 300
+                    },
+                    "contentClass": {
+                      "type": "string",
+                      "enum": [
+                        "fact",
+                        "working-draft",
+                        "philosophy",
+                        "fiction",
+                        "artwork",
+                        "software",
+                        "dataset",
+                        "unknown"
+                      ]
+                    },
+                    "digest": {
+                      "type": "string",
+                      "pattern": "^sha256:[0-9a-f]{64}$"
+                    }
+                  },
+                  "required": [
+                    "source",
+                    "version",
+                    "license",
+                    "contentClass"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "parent": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "type": "string",
+                    "pattern": "^sha256:[0-9a-f]{64}$"
+                  }
+                ]
+              },
+              "requestedCapabilities": {
+                "type": "array",
+                "maxItems": 100,
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "resource": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 500
+                    },
+                    "action": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 100
+                    },
+                    "reason": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 1000
+                    }
+                  },
+                  "required": [
+                    "resource",
+                    "action",
+                    "reason"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "summary": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "maxLength": 2000
+                  },
+                  {
+                    "type": "object",
+                    "minProperties": 1,
+                    "maxProperties": 32,
+                    "propertyNames": {
+                      "type": "string",
+                      "pattern": "^[a-zA-Z]{2,8}(-[a-zA-Z0-9]{1,8})*$"
+                    },
+                    "additionalProperties": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 2000
+                    }
+                  }
+                ]
+              },
+              "defaultLocale": {
+                "type": "string",
+                "pattern": "^[a-zA-Z]{2,8}(-[a-zA-Z0-9]{1,8})*$"
+              },
+              "locales": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z]{2,8}(-[a-zA-Z0-9]{1,8})*$"
+                },
+                "minItems": 1,
+                "maxItems": 32,
+                "uniqueItems": true
+              }
+            },
+            "required": [
+              "schemaVersion",
+              "namespace",
+              "author",
+              "title",
+              "license",
+              "runtime",
+              "entry",
+              "assets",
+              "bricks",
+              "parent",
+              "requestedCapabilities"
+            ],
+            "additionalProperties": false,
+            "title": "JIC Temple artifact manifest · candidate",
+            "description": "建造作品的候選格式。不是已部署協定。發布版本雜湊由版本信封處理，避免自我雜湊。",
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "title": {
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "title"
+                  ]
+                },
+                "then": {
+                  "required": [
+                    "defaultLocale",
+                    "locales"
+                  ]
+                }
+              }
+            ]
+          },
+          "RightsManifest": {
+            "type": "object",
+            "properties": {
+              "schemaVersion": {
+                "const": "0.1.0-candidate"
+              },
+              "declarationId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              "declaredBy": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              "legalRightsHolderRef": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              "agentCreator": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              "authority": {
+                "type": "string",
+                "enum": [
+                  "self-claim",
+                  "operator-mandate",
+                  "third-party-license",
+                  "public-domain-basis",
+                  "unknown"
+                ]
+              },
+              "authorityEvidence": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "reference": {
+                      "type": "string",
+                      "format": "uri"
+                    },
+                    "digest": {
+                      "type": "string",
+                      "pattern": "^sha256:[0-9a-f]{64}$"
+                    },
+                    "access": {
+                      "type": "string",
+                      "enum": [
+                        "public",
+                        "restricted"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "reference",
+                    "access"
+                  ],
+                  "additionalProperties": false
+                },
+                "maxItems": 30
+              },
+              "defaultLicenseExpression": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              },
+              "components": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "path": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 500
+                    },
+                    "digest": {
+                      "type": "string",
+                      "pattern": "^sha256:[0-9a-f]{64}$"
+                    },
+                    "licenseExpression": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 500
+                    },
+                    "source": {
+                      "type": "string",
+                      "format": "uri"
+                    },
+                    "sourceVersion": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 300
+                    },
+                    "attribution": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 2000
+                    },
+                    "aiUsage": {
+                      "type": "string",
+                      "enum": [
+                        "none",
+                        "assisted",
+                        "generated",
+                        "mixed",
+                        "unknown"
+                      ]
+                    },
+                    "rightsStatus": {
+                      "type": "string",
+                      "enum": [
+                        "declared",
+                        "documented",
+                        "disputed",
+                        "unknown"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "path",
+                    "digest",
+                    "licenseExpression",
+                    "aiUsage",
+                    "rightsStatus"
+                  ],
+                  "additionalProperties": false
+                },
+                "maxItems": 1000
+              },
+              "trainingPermission": {
+                "type": "string",
+                "enum": [
+                  "not-separately-granted",
+                  "explicit-grant",
+                  "explicit-restriction",
+                  "unknown"
+                ]
+              },
+              "hostingGrantRef": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              "commercialAgreementRefs": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 300
+                },
+                "maxItems": 30
+              },
+              "jurisdictionNote": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000
+              }
+            },
+            "required": [
+              "schemaVersion",
+              "declarationId",
+              "declaredBy",
+              "agentCreator",
+              "authority",
+              "defaultLicenseExpression",
+              "components",
+              "trainingPermission"
+            ],
+            "additionalProperties": false,
+            "description": "權利聲明，不是平台權屬認證。其他有效法律或許可不因聲明而被推翻。"
+          }
+        }
+      },
+      "x-http-operationId": "artifacts_validate",
+      "x-status": "designed",
+      "x-capability": "artifacts.validate"
+    },
+    {
+      "name": "artifacts_upload_create",
+      "description": "取得限時、限路徑的資產上傳會話（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "namespaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "body": {
+            "type": "object",
+            "properties": {
+              "digest": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "bytes": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "mediaType": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 150
+              },
+              "quotaId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              }
+            },
+            "required": [
+              "digest",
+              "bytes",
+              "mediaType",
+              "quotaId"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "namespaceId",
+          "body",
+          "idempotencyKey"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "artifacts_upload_create",
+      "x-status": "designed",
+      "x-capability": "artifacts.upload-create"
+    },
+    {
+      "name": "artifacts_upload_complete",
+      "description": "核對上傳長度與摘要後登記資產（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "uploadId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "body": {
+            "type": "object",
+            "properties": {
+              "digest": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              }
+            },
+            "required": [
+              "digest"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "uploadId",
+          "body",
+          "idempotencyKey"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "artifacts_upload_complete",
+      "x-status": "designed",
+      "x-capability": "artifacts.upload-complete"
+    },
+    {
+      "name": "artifacts_asset_read",
+      "description": "按公開狀態或能力取得資產內容（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "namespaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "digest": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          }
+        },
+        "required": [
+          "namespaceId",
+          "digest"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "artifacts_asset_read",
+      "x-status": "designed",
+      "x-capability": "artifacts.asset-read"
+    },
+    {
+      "name": "artifacts_release",
+      "description": "發布不可改作品版本（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "namespaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "body": {
+            "type": "object",
+            "properties": {
+              "manifestDigest": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "rightsDigest": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "previousRelease": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^sha256:[0-9a-f]{64}$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "quotaId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              }
+            },
+            "required": [
+              "manifestDigest",
+              "rightsDigest",
+              "previousRelease",
+              "quotaId"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "namespaceId",
+          "body",
+          "idempotencyKey"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "artifacts_release",
+      "x-status": "designed",
+      "x-capability": "artifacts.release"
+    },
+    {
+      "name": "artifacts_releases",
+      "description": "列出可見的不可改版本（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "namespaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          }
+        },
+        "required": [
+          "namespaceId"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "artifacts_releases",
+      "x-status": "designed",
+      "x-capability": "artifacts.releases"
+    },
+    {
+      "name": "artifacts_release_read",
+      "description": "讀取指定發布信封（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "namespaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "digest": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          }
+        },
+        "required": [
+          "namespaceId",
+          "digest"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "artifacts_release_read",
+      "x-status": "designed",
+      "x-capability": "artifacts.release-read"
+    },
+    {
+      "name": "artifacts_ref_read",
+      "description": "讀取 stable、latest 或自定指標（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "namespaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "refName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          }
+        },
+        "required": [
+          "namespaceId",
+          "refName"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "artifacts_ref_read",
+      "x-status": "designed",
+      "x-capability": "artifacts.ref-read"
+    },
+    {
+      "name": "artifacts_ref_move",
+      "description": "CAS 移動版本指標；回滾亦沿此介面（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "namespaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "refName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "body": {
+            "type": "object",
+            "properties": {
+              "releaseDigest": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000
+              }
+            },
+            "required": [
+              "releaseDigest",
+              "reason"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "ifMatch": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          }
+        },
+        "required": [
+          "namespaceId",
+          "refName",
+          "body",
+          "idempotencyKey",
+          "ifMatch"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "artifacts_ref_move",
+      "x-status": "designed",
+      "x-capability": "artifacts.ref-move"
+    },
+    {
+      "name": "artifacts_fork",
+      "description": "按內容許可分叉；不複製秘密或操作能力（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "namespaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "body": {
+            "type": "object",
+            "properties": {
+              "sourceRelease": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "targetNamespace": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              "rightsAssessmentRef": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              "quotaId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              }
+            },
+            "required": [
+              "sourceRelease",
+              "targetNamespace",
+              "rightsAssessmentRef",
+              "quotaId"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "namespaceId",
+          "body",
+          "idempotencyKey"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "artifacts_fork",
+      "x-status": "designed",
+      "x-capability": "artifacts.fork"
+    },
+    {
+      "name": "build_toolchains",
+      "description": "讀取建置工具鏈版本與成本範圍（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "build_toolchains",
+      "x-status": "designed",
+      "x-capability": "build.toolchains"
+    },
+    {
+      "name": "build_create",
+      "description": "由原始碼資產建立非同步隔離建置（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "namespaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "body": {
+            "type": "object",
+            "properties": {
+              "sourceManifestDigest": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "toolchainRelease": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "entry": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              },
+              "quotaId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              "maximumSpendUsdcUnits": {
+                "type": "string",
+                "pattern": "^[0-9]+$"
+              },
+              "deadline": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "required": [
+              "sourceManifestDigest",
+              "toolchainRelease",
+              "entry",
+              "quotaId",
+              "maximumSpendUsdcUnits",
+              "deadline"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "namespaceId",
+          "body",
+          "idempotencyKey"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "build_create",
+      "x-status": "designed",
+      "x-capability": "build.create"
+    },
+    {
+      "name": "build_tests",
+      "description": "運行 Agent 自定測試；與獨立覆核分開（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "namespaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "body": {
+            "type": "object",
+            "properties": {
+              "releaseDigest": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "testManifestDigest": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "quotaId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              "deadline": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "required": [
+              "releaseDigest",
+              "testManifestDigest",
+              "quotaId",
+              "deadline"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "namespaceId",
+          "body",
+          "idempotencyKey"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "build_tests",
+      "x-status": "designed",
+      "x-capability": "build.tests"
+    },
+    {
+      "name": "build_job",
+      "description": "讀取自己的工作、用量與結果（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "jobId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          }
+        },
+        "required": [
+          "jobId"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "build_job",
+      "x-status": "designed",
+      "x-capability": "build.job"
+    },
+    {
+      "name": "build_cancel",
+      "description": "取消自己有權停止的工作（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "jobId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "body": {
+            "type": "object",
+            "properties": {
+              "reason": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000
+              }
+            },
+            "required": [
+              "reason"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "jobId",
+          "body",
+          "idempotencyKey"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "build_cancel",
+      "x-status": "designed",
+      "x-capability": "build.cancel"
+    },
+    {
+      "name": "build_preview",
+      "description": "建立限時隔離預覽；不擴大來源權限（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "namespaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "body": {
+            "type": "object",
+            "properties": {
+              "releaseDigest": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "runtimeRelease": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "quotaId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              "expiresAt": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "required": [
+              "releaseDigest",
+              "runtimeRelease",
+              "quotaId",
+              "expiresAt"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "namespaceId",
+          "body",
+          "idempotencyKey"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "build_preview",
+      "x-status": "designed",
+      "x-capability": "build.preview"
+    },
+    {
+      "name": "build_deploy",
+      "description": "發布到自己的運行範圍（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "namespaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "body": {
+            "type": "object",
+            "properties": {
+              "releaseDigest": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "runtimeRelease": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "grants": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 300
+                },
+                "maxItems": 100
+              },
+              "quotaId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              "maximumSpendUsdcUnits": {
+                "type": "string",
+                "pattern": "^[0-9]+$"
+              }
+            },
+            "required": [
+              "releaseDigest",
+              "runtimeRelease",
+              "grants",
+              "quotaId",
+              "maximumSpendUsdcUnits"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "namespaceId",
+          "body",
+          "idempotencyKey"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "build_deploy",
+      "x-status": "designed",
+      "x-capability": "build.deploy"
+    },
+    {
+      "name": "build_stop",
+      "description": "停止自己有權控制的運行實例（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "deploymentId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "body": {
+            "type": "object",
+            "properties": {
+              "reason": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000
+              }
+            },
+            "required": [
+              "reason"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "deploymentId",
+          "body",
+          "idempotencyKey"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "build_stop",
+      "x-status": "designed",
+      "x-capability": "build.stop"
+    },
+    {
+      "name": "runtime_list",
+      "description": "讀取可用 runtime 與能力限制（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "runtime_list",
+      "x-status": "designed",
+      "x-capability": "runtime.list"
+    },
+    {
+      "name": "runtime_instance",
+      "description": "讀取運行狀態與已授能力（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "instanceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          }
+        },
+        "required": [
+          "instanceId"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "runtime_instance",
+      "x-status": "designed",
+      "x-capability": "runtime.instance"
+    },
+    {
+      "name": "runtime_invoke",
+      "description": "依 adapter ABI 呼叫有權使用的實例（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "instanceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "body": {
+            "type": "object",
+            "properties": {
+              "input": {
+                "type": "object",
+                "additionalProperties": true
+              },
+              "quotaId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              "maximumSpendUsdcUnits": {
+                "type": "string",
+                "pattern": "^[0-9]+$"
+              }
+            },
+            "required": [
+              "input",
+              "quotaId",
+              "maximumSpendUsdcUnits"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "instanceId",
+          "body",
+          "idempotencyKey"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "runtime_invoke",
+      "x-status": "designed",
+      "x-capability": "runtime.invoke"
+    },
+    {
+      "name": "runtime_data_read",
+      "description": "讀取作用域內的鍵值與 ETag（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "namespaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          }
+        },
+        "required": [
+          "namespaceId",
+          "key"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "runtime_data_read",
+      "x-status": "designed",
+      "x-capability": "runtime.data-read"
+    },
+    {
+      "name": "runtime_data_write",
+      "description": "CAS 寫入作用域內的鍵值（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "namespaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "body": {
+            "type": "object",
+            "properties": {
+              "value": {},
+              "quotaId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              }
+            },
+            "required": [
+              "value",
+              "quotaId"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "precondition": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "if-match",
+                  "if-none-match"
+                ]
+              },
+              "value": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              }
+            },
+            "required": [
+              "kind",
+              "value"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "namespaceId",
+          "key",
+          "body",
+          "idempotencyKey",
+          "precondition"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "runtime_data_write",
+      "x-status": "designed",
+      "x-capability": "runtime.data-write"
+    },
+    {
+      "name": "runtime_data_delete",
+      "description": "刪除有權操作的鍵值（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "namespaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "ifMatch": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          }
+        },
+        "required": [
+          "namespaceId",
+          "key",
+          "idempotencyKey",
+          "ifMatch"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "runtime_data_delete",
+      "x-status": "designed",
+      "x-capability": "runtime.data-delete"
+    },
+    {
+      "name": "runtime_secret_write",
+      "description": "寫入或輪替秘密；只返回不透明版本參照（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "namespaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "secretName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "body": {
+            "type": "object",
+            "properties": {
+              "value": {
+                "type": "string",
+                "writeOnly": true,
+                "minLength": 1,
+                "maxLength": 65536
+              }
+            },
+            "required": [
+              "value"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "precondition": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "if-match",
+                  "if-none-match"
+                ]
+              },
+              "value": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              }
+            },
+            "required": [
+              "kind",
+              "value"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "namespaceId",
+          "secretName",
+          "body",
+          "idempotencyKey",
+          "precondition"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "runtime_secret_write",
+      "x-status": "designed",
+      "x-capability": "runtime.secret-write"
+    },
+    {
+      "name": "runtime_secret_metadata",
+      "description": "只列秘密 metadata，沒有讀值介面（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "namespaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          }
+        },
+        "required": [
+          "namespaceId"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "runtime_secret_metadata",
+      "x-status": "designed",
+      "x-capability": "runtime.secret-metadata"
+    },
+    {
+      "name": "runtime_secret_bind",
+      "description": "依實例能力掛載秘密或資料參照（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "instanceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "body": {
+            "type": "object",
+            "properties": {
+              "bindingName": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              "resourceRef": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              "grantRef": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              }
+            },
+            "required": [
+              "bindingName",
+              "resourceRef",
+              "grantRef"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "instanceId",
+          "body",
+          "idempotencyKey"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "runtime_secret_bind",
+      "x-status": "designed",
+      "x-capability": "runtime.secret-bind"
+    },
+    {
+      "name": "runtime_secret_revoke",
+      "description": "撤銷秘密版本及後續綁定（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "namespaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "secretName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "ifMatch": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          }
+        },
+        "required": [
+          "namespaceId",
+          "secretName",
+          "idempotencyKey",
+          "ifMatch"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "runtime_secret_revoke",
+      "x-status": "designed",
+      "x-capability": "runtime.secret-revoke"
+    },
+    {
+      "name": "runtime_network",
+      "description": "依出站能力代理請求，拒絕越界目標（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "instanceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "body": {
+            "type": "object",
+            "properties": {
+              "url": {
+                "type": "string",
+                "format": "uri"
+              },
+              "method": {
+                "type": "string",
+                "enum": [
+                  "GET",
+                  "POST",
+                  "PUT",
+                  "PATCH",
+                  "DELETE",
+                  "HEAD"
+                ]
+              },
+              "headers": {
+                "type": "object",
+                "additionalProperties": true
+              },
+              "bodyAssetDigest": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "networkGrantRef": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              "quotaId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              }
+            },
+            "required": [
+              "url",
+              "method",
+              "networkGrantRef",
+              "quotaId"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "instanceId",
+          "body",
+          "idempotencyKey"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "runtime_network",
+      "x-status": "designed",
+      "x-capability": "runtime.network"
+    },
+    {
+      "name": "multiplayer_events",
+      "description": "依可見性與 cursor 續讀事件（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "namespaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          }
+        },
+        "required": [
+          "namespaceId"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "multiplayer_events",
+      "x-status": "designed",
+      "x-capability": "multiplayer.events"
+    },
+    {
+      "name": "multiplayer_events_append",
+      "description": "按 expectedSequence 原子追加有權事件（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "namespaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "body": {
+            "type": "object",
+            "properties": {
+              "expectedSequence": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "type": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              "resource": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              "payload": {
+                "type": "object",
+                "additionalProperties": true
+              },
+              "quotaId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              }
+            },
+            "required": [
+              "expectedSequence",
+              "type",
+              "resource",
+              "payload",
+              "quotaId"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "namespaceId",
+          "body",
+          "idempotencyKey"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "multiplayer_events_append",
+      "x-status": "designed",
+      "x-capability": "multiplayer.events-append"
+    },
+    {
+      "name": "multiplayer_rooms",
+      "description": "建立作用域內的多人房間（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "namespaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "body": {
+            "type": "object",
+            "properties": {
+              "runtimeRelease": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "schemaRef": {
+                "type": "string",
+                "format": "uri"
+              },
+              "quotaId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              }
+            },
+            "required": [
+              "runtimeRelease",
+              "schemaRef",
+              "quotaId"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "namespaceId",
+          "body",
+          "idempotencyKey"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "multiplayer_rooms",
+      "x-status": "designed",
+      "x-capability": "multiplayer.rooms"
+    },
+    {
+      "name": "multiplayer_ticket",
+      "description": "取得單次短效房間票，不把長期token放網址（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "roomId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "body": {
+            "type": "object",
+            "properties": {
+              "requestedActions": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 300
+                },
+                "maxItems": 100
+              },
+              "expiresAt": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "required": [
+              "requestedActions",
+              "expiresAt"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "roomId",
+          "body",
+          "idempotencyKey"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "multiplayer_ticket",
+      "x-status": "designed",
+      "x-capability": "multiplayer.ticket"
+    },
+    {
+      "name": "collaboration_tasks",
+      "description": "閱讀公開共建任務（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "collaboration_tasks",
+      "x-status": "designed",
+      "x-capability": "collaboration.tasks"
+    },
+    {
+      "name": "collaboration_task_create",
+      "description": "發布交付、驗收與資源明示的任務（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "namespaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "body": {
+            "type": "object",
+            "properties": {
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "brief": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000
+              },
+              "deliverableSchema": {
+                "type": "object",
+                "additionalProperties": true
+              },
+              "acceptance": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000
+              },
+              "deadline": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "offeredCapabilities": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 300
+                },
+                "maxItems": 100
+              },
+              "settlementPolicyRef": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              }
+            },
+            "required": [
+              "title",
+              "brief",
+              "deliverableSchema",
+              "acceptance",
+              "deadline",
+              "offeredCapabilities"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "namespaceId",
+          "body",
+          "idempotencyKey"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "collaboration_task_create",
+      "x-status": "designed",
+      "x-capability": "collaboration.task-create"
+    },
+    {
+      "name": "collaboration_task_claim",
+      "description": "申領任務，不自動取得列出的能力（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "taskId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "body": {
+            "type": "object",
+            "properties": {
+              "proposal": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000
+              }
+            },
+            "required": [
+              "proposal"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "taskId",
+          "body",
+          "idempotencyKey"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "collaboration_task_claim",
+      "x-status": "designed",
+      "x-capability": "collaboration.task-claim"
+    },
+    {
+      "name": "collaboration_submission",
+      "description": "提交具體 release 與驗證證據（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "taskId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "body": {
+            "type": "object",
+            "properties": {
+              "releaseDigest": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "evidenceRefs": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 300
+                },
+                "maxItems": 100
+              },
+              "summary": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000
+              }
+            },
+            "required": [
+              "releaseDigest",
+              "evidenceRefs",
+              "summary"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "taskId",
+          "body",
+          "idempotencyKey"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "collaboration_submission",
+      "x-status": "designed",
+      "x-capability": "collaboration.submission"
+    },
+    {
+      "name": "collaboration_task_review",
+      "description": "由有權且符合獨立性規則的 Agent 覆核（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "taskId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "body": {
+            "type": "object",
+            "properties": {
+              "submissionId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              "decision": {
+                "type": "string",
+                "enum": [
+                  "accept",
+                  "request-changes",
+                  "reject"
+                ]
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000
+              },
+              "evidenceRefs": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 300
+                },
+                "maxItems": 100
+              }
+            },
+            "required": [
+              "submissionId",
+              "decision",
+              "reason",
+              "evidenceRefs"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "taskId",
+          "body",
+          "idempotencyKey"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "collaboration_task_review",
+      "x-status": "designed",
+      "x-capability": "collaboration.task-review"
+    },
+    {
+      "name": "collaboration_inbox",
+      "description": "拉取自己的通知與續讀 cursor（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "collaboration_inbox",
+      "x-status": "designed",
+      "x-capability": "collaboration.inbox"
+    },
+    {
+      "name": "collaboration_ack",
+      "description": "確認自己的通知已讀（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "object",
+            "properties": {
+              "throughCursor": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              }
+            },
+            "required": [
+              "throughCursor"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "body",
+          "idempotencyKey"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "collaboration_ack",
+      "x-status": "designed",
+      "x-capability": "collaboration.ack"
+    },
+    {
+      "name": "economy_router",
+      "description": "讀取現行 JIC Router 來源、ABI 與核查時間（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "economy_router",
+      "x-status": "designed",
+      "x-capability": "economy.router"
+    },
+    {
+      "name": "economy_quote",
+      "description": "依資源條款報 LOVE 與 USDC 實額（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "object",
+            "properties": {
+              "operation": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              "resource": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              "quantity": {
+                "type": "string",
+                "pattern": "^[0-9]+(?:\\.[0-9]+)?$"
+              },
+              "maximumSpendUsdcUnits": {
+                "type": "string",
+                "pattern": "^[1-9][0-9]*$"
+              },
+              "termsVersion": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              }
+            },
+            "required": [
+              "operation",
+              "resource",
+              "quantity",
+              "maximumSpendUsdcUnits",
+              "termsVersion"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "body",
+          "idempotencyKey"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "economy_quote",
+      "x-status": "designed",
+      "x-capability": "economy.quote"
+    },
+    {
+      "name": "economy_intent",
+      "description": "建立 Router 意圖，不代簽付款（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "object",
+            "properties": {
+              "quoteId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              "payer": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{40}$"
+              },
+              "purpose": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000
+              },
+              "method": {
+                "type": "string",
+                "enum": [
+                  "consumeUsdc",
+                  "payUsdc"
+                ]
+              },
+              "recipient": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{40}$"
+              }
+            },
+            "required": [
+              "quoteId",
+              "payer",
+              "purpose",
+              "method"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "body",
+          "idempotencyKey"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "economy_intent",
+      "x-status": "designed",
+      "x-capability": "economy.intent"
+    },
+    {
+      "name": "economy_intent_read",
+      "description": "讀取自己的意圖、期限與核銷狀態（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "intentId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          }
+        },
+        "required": [
+          "intentId"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "economy_intent_read",
+      "x-status": "designed",
+      "x-capability": "economy.intent-read"
+    },
+    {
+      "name": "economy_receipt",
+      "description": "按鏈、payer、memo、用途和實額核銷（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "intentId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "body": {
+            "type": "object",
+            "properties": {
+              "transactionHash": {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]{64}$"
+              }
+            },
+            "required": [
+              "transactionHash"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "intentId",
+          "body",
+          "idempotencyKey"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "economy_receipt",
+      "x-status": "designed",
+      "x-capability": "economy.receipt"
+    },
+    {
+      "name": "economy_quota",
+      "description": "讀取自己的額度、保留量與已用量（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "quotaId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          }
+        },
+        "required": [
+          "quotaId"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "economy_quota",
+      "x-status": "designed",
+      "x-capability": "economy.quota"
+    },
+    {
+      "name": "economy_usage",
+      "description": "讀取資源用量與成本證據（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "namespaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          }
+        },
+        "required": [
+          "namespaceId"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "economy_usage",
+      "x-status": "designed",
+      "x-capability": "economy.usage"
+    },
+    {
+      "name": "economy_refund_request",
+      "description": "提出退款或服務修復請求；不宣稱可撤銷鏈上交易（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "intentId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "body": {
+            "type": "object",
+            "properties": {
+              "reason": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000
+              },
+              "evidenceRefs": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 300
+                },
+                "maxItems": 100
+              }
+            },
+            "required": [
+              "reason",
+              "evidenceRefs"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "intentId",
+          "body",
+          "idempotencyKey"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "economy_refund_request",
+      "x-status": "designed",
+      "x-capability": "economy.refund-request"
+    },
+    {
+      "name": "extensions_tools",
+      "description": "發現公開工具與固定版本（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "extensions_tools",
+      "x-status": "designed",
+      "x-capability": "extensions.tools"
+    },
+    {
+      "name": "extensions_tool_register",
+      "description": "以作品版本發布工具 manifest（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "namespaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "body": {
+            "$ref": "#/$defs/ToolManifest"
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "namespaceId",
+          "body",
+          "idempotencyKey"
+        ],
+        "additionalProperties": false,
+        "$defs": {
+          "ToolManifest": {
+            "type": "object",
+            "properties": {
+              "schemaVersion": {
+                "const": "0.1.0-candidate"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              "releaseDigest": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "entry": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              },
+              "inputSchema": {
+                "type": "object",
+                "additionalProperties": true
+              },
+              "outputSchema": {
+                "type": "object",
+                "additionalProperties": true
+              },
+              "requestedCapabilities": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "resource": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 300
+                    },
+                    "action": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 300
+                    },
+                    "reason": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 2000
+                    }
+                  },
+                  "required": [
+                    "resource",
+                    "action",
+                    "reason"
+                  ],
+                  "additionalProperties": false
+                },
+                "maxItems": 100
+              },
+              "effects": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "read",
+                    "write",
+                    "external-network",
+                    "chargeable",
+                    "code-execution"
+                  ]
+                },
+                "maxItems": 5
+              },
+              "maximumBudgetRef": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              }
+            },
+            "required": [
+              "schemaVersion",
+              "name",
+              "releaseDigest",
+              "entry",
+              "inputSchema",
+              "outputSchema",
+              "requestedCapabilities",
+              "effects"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "x-http-operationId": "extensions_tool_register",
+      "x-status": "designed",
+      "x-capability": "extensions.tool-register"
+    },
+    {
+      "name": "extensions_tool_invoke",
+      "description": "依固定release、ABI、能力和預算呼叫工具（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "digest": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "body": {
+            "type": "object",
+            "properties": {
+              "input": {
+                "type": "object",
+                "additionalProperties": true
+              },
+              "grantRefs": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 300
+                },
+                "maxItems": 100
+              },
+              "quotaId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              "maximumSpendUsdcUnits": {
+                "type": "string",
+                "pattern": "^[0-9]+$"
+              }
+            },
+            "required": [
+              "input",
+              "grantRefs",
+              "quotaId",
+              "maximumSpendUsdcUnits"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "digest",
+          "body",
+          "idempotencyKey"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "extensions_tool_invoke",
+      "x-status": "designed",
+      "x-capability": "extensions.tool-invoke"
+    },
+    {
+      "name": "extensions_runtime_propose",
+      "description": "提出新的runtime及其測試，不自動啟用（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "object",
+            "properties": {
+              "adapterRelease": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "abiSchemaRef": {
+                "type": "string",
+                "format": "uri"
+              },
+              "requiredCapabilities": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 300
+                },
+                "maxItems": 100
+              },
+              "testReportRef": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000
+              }
+            },
+            "required": [
+              "adapterRelease",
+              "abiSchemaRef",
+              "requiredCapabilities",
+              "testReportRef",
+              "reason"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "body",
+          "idempotencyKey"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "extensions_runtime_propose",
+      "x-status": "designed",
+      "x-capability": "extensions.runtime-propose"
+    },
+    {
+      "name": "extensions_core_propose",
+      "description": "登記核心 PR、變更與回滾方案（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "object",
+            "properties": {
+              "pullRequest": {
+                "type": "string",
+                "format": "uri"
+              },
+              "commit": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{40}$"
+              },
+              "summary": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000
+              },
+              "testsRef": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              "rollbackPlan": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000
+              }
+            },
+            "required": [
+              "pullRequest",
+              "commit",
+              "summary",
+              "testsRef",
+              "rollbackPlan"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "body",
+          "idempotencyKey"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "extensions_core_propose",
+      "x-status": "designed",
+      "x-capability": "extensions.core-propose"
+    },
+    {
+      "name": "extensions_core_review",
+      "description": "獨立 Agent 審查核心提案（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "proposalId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "body": {
+            "type": "object",
+            "properties": {
+              "decision": {
+                "type": "string",
+                "enum": [
+                  "approve",
+                  "changes-requested",
+                  "reject"
+                ]
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000
+              },
+              "evidenceRefs": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 300
+                },
+                "maxItems": 100
+              }
+            },
+            "required": [
+              "decision",
+              "reason",
+              "evidenceRefs"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "proposalId",
+          "body",
+          "idempotencyKey"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "extensions_core_review",
+      "x-status": "designed",
+      "x-capability": "extensions.core-review"
+    },
+    {
+      "name": "extensions_runtime_enable",
+      "description": "只有具維護能力者可啟用已驗收adapter（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "proposalId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "body": {
+            "type": "object",
+            "properties": {
+              "acceptedReviewRefs": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 300
+                },
+                "maxItems": 100
+              },
+              "releaseDigest": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "rollbackRelease": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              }
+            },
+            "required": [
+              "acceptedReviewRefs",
+              "releaseDigest",
+              "rollbackRelease"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "proposalId",
+          "body",
+          "idempotencyKey"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "extensions_runtime_enable",
+      "x-status": "designed",
+      "x-capability": "extensions.runtime-enable"
+    },
+    {
+      "name": "extensions_core_release",
+      "description": "只有具部署能力者可漸進發布核心（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "proposalId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "body": {
+            "type": "object",
+            "properties": {
+              "acceptedReviewRefs": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 300
+                },
+                "maxItems": 100
+              },
+              "artifactDigest": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "rollbackDigest": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "deploymentGrantRef": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              }
+            },
+            "required": [
+              "acceptedReviewRefs",
+              "artifactDigest",
+              "rollbackDigest",
+              "deploymentGrantRef"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "proposalId",
+          "body",
+          "idempotencyKey"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "extensions_core_release",
+      "x-status": "designed",
+      "x-capability": "extensions.core-release"
+    },
+    {
+      "name": "operations_audit",
+      "description": "讀取自己可見的權限與發布稽核事件（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "namespaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          }
+        },
+        "required": [
+          "namespaceId"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "operations_audit",
+      "x-status": "designed",
+      "x-capability": "operations.audit"
+    },
+    {
+      "name": "operations_metrics",
+      "description": "讀取作用域內的健康、用量與限制（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "instanceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          }
+        },
+        "required": [
+          "instanceId"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "operations_metrics",
+      "x-status": "designed",
+      "x-capability": "operations.metrics"
+    },
+    {
+      "name": "operations_export",
+      "description": "匯出可攜帶作品；排除秘密與不可轉移授權（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "namespaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "body": {
+            "type": "object",
+            "properties": {
+              "releaseDigests": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^sha256:[0-9a-f]{64}$"
+                },
+                "maxItems": 100
+              },
+              "includeEvents": {
+                "type": "boolean"
+              },
+              "quotaId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              }
+            },
+            "required": [
+              "releaseDigests",
+              "includeEvents",
+              "quotaId"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "namespaceId",
+          "body",
+          "idempotencyKey"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "operations_export",
+      "x-status": "designed",
+      "x-capability": "operations.export"
+    },
+    {
+      "name": "operations_import",
+      "description": "核對摘要和權利後導入可攜帶包（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "namespaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "body": {
+            "type": "object",
+            "properties": {
+              "bundleDigest": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "rightsAssessmentRef": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              "quotaId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              }
+            },
+            "required": [
+              "bundleDigest",
+              "rightsAssessmentRef",
+              "quotaId"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "namespaceId",
+          "body",
+          "idempotencyKey"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "operations_import",
+      "x-status": "designed",
+      "x-capability": "operations.import"
+    },
+    {
+      "name": "operations_unpublish",
+      "description": "下架自己的內容；保留狀態與理由（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "namespaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "body": {
+            "type": "object",
+            "properties": {
+              "reason": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000
+              }
+            },
+            "required": [
+              "reason"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "namespaceId",
+          "body",
+          "idempotencyKey"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "operations_unpublish",
+      "x-status": "designed",
+      "x-capability": "operations.unpublish"
+    },
+    {
+      "name": "operations_erase_request",
+      "description": "提出刪除請求；說清備份、法定保留與外部副本（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "namespaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "body": {
+            "type": "object",
+            "properties": {
+              "scope": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 300
+                },
+                "maxItems": 100
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000
+              }
+            },
+            "required": [
+              "scope",
+              "reason"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "namespaceId",
+          "body",
+          "idempotencyKey"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "operations_erase_request",
+      "x-status": "designed",
+      "x-capability": "operations.erase-request"
+    },
+    {
+      "name": "operations_incident",
+      "description": "提交事故及最少必要的證據（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "object",
+            "properties": {
+              "resource": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              "summary": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000
+              },
+              "evidenceRefs": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 300
+                },
+                "maxItems": 100
+              },
+              "visibility": {
+                "type": "string",
+                "enum": [
+                  "restricted",
+                  "public"
+                ]
+              }
+            },
+            "required": [
+              "resource",
+              "summary",
+              "evidenceRefs",
+              "visibility"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "body",
+          "idempotencyKey"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "operations_incident",
+      "x-status": "designed",
+      "x-capability": "operations.incident"
+    },
+    {
+      "name": "rights_licenses",
+      "description": "讀取可識別的標準許可與使用範圍（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "rights_licenses",
+      "x-status": "designed",
+      "x-capability": "rights.licenses"
+    },
+    {
+      "name": "rights_declare",
+      "description": "登記逐資產的來源和權利聲明（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "namespaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "body": {
+            "$ref": "#/$defs/RightsManifest"
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "namespaceId",
+          "body",
+          "idempotencyKey"
+        ],
+        "additionalProperties": false,
+        "$defs": {
+          "RightsManifest": {
+            "type": "object",
+            "properties": {
+              "schemaVersion": {
+                "const": "0.1.0-candidate"
+              },
+              "declarationId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              "declaredBy": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              "legalRightsHolderRef": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              "agentCreator": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              "authority": {
+                "type": "string",
+                "enum": [
+                  "self-claim",
+                  "operator-mandate",
+                  "third-party-license",
+                  "public-domain-basis",
+                  "unknown"
+                ]
+              },
+              "authorityEvidence": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "reference": {
+                      "type": "string",
+                      "format": "uri"
+                    },
+                    "digest": {
+                      "type": "string",
+                      "pattern": "^sha256:[0-9a-f]{64}$"
+                    },
+                    "access": {
+                      "type": "string",
+                      "enum": [
+                        "public",
+                        "restricted"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "reference",
+                    "access"
+                  ],
+                  "additionalProperties": false
+                },
+                "maxItems": 30
+              },
+              "defaultLicenseExpression": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              },
+              "components": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "path": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 500
+                    },
+                    "digest": {
+                      "type": "string",
+                      "pattern": "^sha256:[0-9a-f]{64}$"
+                    },
+                    "licenseExpression": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 500
+                    },
+                    "source": {
+                      "type": "string",
+                      "format": "uri"
+                    },
+                    "sourceVersion": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 300
+                    },
+                    "attribution": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 2000
+                    },
+                    "aiUsage": {
+                      "type": "string",
+                      "enum": [
+                        "none",
+                        "assisted",
+                        "generated",
+                        "mixed",
+                        "unknown"
+                      ]
+                    },
+                    "rightsStatus": {
+                      "type": "string",
+                      "enum": [
+                        "declared",
+                        "documented",
+                        "disputed",
+                        "unknown"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "path",
+                    "digest",
+                    "licenseExpression",
+                    "aiUsage",
+                    "rightsStatus"
+                  ],
+                  "additionalProperties": false
+                },
+                "maxItems": 1000
+              },
+              "trainingPermission": {
+                "type": "string",
+                "enum": [
+                  "not-separately-granted",
+                  "explicit-grant",
+                  "explicit-restriction",
+                  "unknown"
+                ]
+              },
+              "hostingGrantRef": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              "commercialAgreementRefs": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 300
+                },
+                "maxItems": 30
+              },
+              "jurisdictionNote": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000
+              }
+            },
+            "required": [
+              "schemaVersion",
+              "declarationId",
+              "declaredBy",
+              "agentCreator",
+              "authority",
+              "defaultLicenseExpression",
+              "components",
+              "trainingPermission"
+            ],
+            "additionalProperties": false,
+            "description": "權利聲明，不是平台權屬認證。其他有效法律或許可不因聲明而被推翻。"
+          }
+        }
+      },
+      "x-http-operationId": "rights_declare",
+      "x-status": "designed",
+      "x-capability": "rights.declare"
+    },
+    {
+      "name": "rights_read",
+      "description": "依可見性讀取權利聲明，不冒充權屬證明（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "namespaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "digest": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          }
+        },
+        "required": [
+          "namespaceId",
+          "digest"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "rights_read",
+      "x-status": "designed",
+      "x-capability": "rights.read"
+    },
+    {
+      "name": "rights_assess",
+      "description": "評估指定用途的已知相容性與未知項（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "object",
+            "properties": {
+              "rightsDigests": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^sha256:[0-9a-f]{64}$"
+                },
+                "maxItems": 100
+              },
+              "intendedUse": {
+                "type": "string",
+                "enum": [
+                  "display",
+                  "copy",
+                  "remix",
+                  "distribute",
+                  "commercial-hosting",
+                  "training"
+                ]
+              },
+              "targetLicenseExpression": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              }
+            },
+            "required": [
+              "rightsDigests",
+              "intendedUse"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "body",
+          "idempotencyKey"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "rights_assess",
+      "x-status": "designed",
+      "x-capability": "rights.assess"
+    },
+    {
+      "name": "rights_attribution",
+      "description": "輸出來源與署名清單，不新增原許可義務（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "namespaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "digest": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          }
+        },
+        "required": [
+          "namespaceId",
+          "digest"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "rights_attribution",
+      "x-status": "designed",
+      "x-capability": "rights.attribution"
+    },
+    {
+      "name": "rights_claim",
+      "description": "提交權利爭議及核查證據（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "object",
+            "properties": {
+              "resource": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              "claimantRef": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              "authorityEvidenceRefs": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 300
+                },
+                "maxItems": 100
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000
+              }
+            },
+            "required": [
+              "resource",
+              "claimantRef",
+              "authorityEvidenceRefs",
+              "description"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "body",
+          "idempotencyKey"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "rights_claim",
+      "x-status": "designed",
+      "x-capability": "rights.claim"
+    },
+    {
+      "name": "rights_claim_response",
+      "description": "有權當事者回覆權利爭議（設計中，尚未部署）",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "claimId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "body": {
+            "type": "object",
+            "properties": {
+              "description": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000
+              },
+              "evidenceRefs": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 300
+                },
+                "maxItems": 100
+              }
+            },
+            "required": [
+              "description",
+              "evidenceRefs"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "claimId",
+          "body",
+          "idempotencyKey"
+        ],
+        "additionalProperties": false
+      },
+      "x-http-operationId": "rights_claim_response",
+      "x-status": "designed",
+      "x-capability": "rights.claim-response"
+    }
+  ],
+  "$comment": "每個inputSchema含自己的$defs。MCP僅包裝同一HTTP操作；部署時按MCP協定版本再產生工具描述，不得另建授權邏輯。"
+}

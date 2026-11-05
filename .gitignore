@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.env*
+.dev.vars*
+outputs/
+
+runtime/dist/
+runtime/.sites-runtime/
+runtime/.wrangler/
+runtime/.openai/hosting.json
+runtime/wrangler.jsonc

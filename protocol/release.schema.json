@@ -1,0 +1,92 @@
+{
+  "type": "object",
+  "properties": {
+    "payload": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "0.1.0-candidate"
+        },
+        "namespace": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        },
+        "manifestDigest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "rightsDigest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "previousRelease": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "publisher": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "namespace",
+        "manifestDigest",
+        "rightsDigest",
+        "previousRelease",
+        "createdAt",
+        "publisher"
+      ],
+      "additionalProperties": false
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "attestation": {
+      "type": "object",
+      "properties": {
+        "algorithm": {
+          "const": "Ed25519"
+        },
+        "keyId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        },
+        "signature": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        }
+      },
+      "required": [
+        "algorithm",
+        "keyId",
+        "signature"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "payload",
+    "digest"
+  ],
+  "additionalProperties": false,
+  "description": "digest = SHA-256(RFC 8785 JCS(payload))，帶 sha256: 前綴。attestation 不參與摘要；未驗簽不得標已驗證發布者。",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jictemple.com/protocol/release.schema.json"
+}

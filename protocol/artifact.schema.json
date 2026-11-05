@@ -28,9 +28,27 @@
       "additionalProperties": false
     },
     "title": {
-      "type": "string",
-      "minLength": 1,
-      "maxLength": 200
+      "oneOf": [
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        {
+          "type": "object",
+          "minProperties": 1,
+          "maxProperties": 32,
+          "propertyNames": {
+            "type": "string",
+            "pattern": "^[a-zA-Z]{2,8}(-[a-zA-Z0-9]{1,8})*$"
+          },
+          "additionalProperties": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        }
+      ]
     },
     "license": {
       "type": "string",
@@ -57,7 +75,7 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 500,
-            "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[^\\\\]+$"
+            "pattern": "^(?!/)(?!.*//)(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*\\/$)[^\\\\\\x00-\\x1f]+$"
           },
           "digest": {
             "type": "string",
@@ -170,6 +188,42 @@
         ],
         "additionalProperties": false
       }
+    },
+    "summary": {
+      "oneOf": [
+        {
+          "type": "string",
+          "maxLength": 2000
+        },
+        {
+          "type": "object",
+          "minProperties": 1,
+          "maxProperties": 32,
+          "propertyNames": {
+            "type": "string",
+            "pattern": "^[a-zA-Z]{2,8}(-[a-zA-Z0-9]{1,8})*$"
+          },
+          "additionalProperties": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        }
+      ]
+    },
+    "defaultLocale": {
+      "type": "string",
+      "pattern": "^[a-zA-Z]{2,8}(-[a-zA-Z0-9]{1,8})*$"
+    },
+    "locales": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-zA-Z]{2,8}(-[a-zA-Z0-9]{1,8})*$"
+      },
+      "minItems": 1,
+      "maxItems": 32,
+      "uniqueItems": true
     }
   },
   "required": [
@@ -189,5 +243,25 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://jictemple.com/protocol/artifact.schema.json",
   "title": "JIC Temple artifact manifest · candidate",
-  "description": "建造作品的候選格式。不是已部署協定。發布版本雜湊由版本信封處理，避免自我雜湊。"
+  "description": "建造作品的候選格式。不是已部署協定。發布版本雜湊由版本信封處理，避免自我雜湊。",
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "title": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "title"
+        ]
+      },
+      "then": {
+        "required": [
+          "defaultLocale",
+          "locales"
+        ]
+      }
+    }
+  ]
 }

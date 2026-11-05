@@ -1,0 +1,178 @@
+{
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "const": "0.1.0-candidate"
+    },
+    "declarationId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 300
+    },
+    "declaredBy": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 300
+    },
+    "legalRightsHolderRef": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 300
+    },
+    "agentCreator": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 300
+    },
+    "authority": {
+      "type": "string",
+      "enum": [
+        "self-claim",
+        "operator-mandate",
+        "third-party-license",
+        "public-domain-basis",
+        "unknown"
+      ]
+    },
+    "authorityEvidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "reference": {
+            "type": "string",
+            "format": "uri"
+          },
+          "digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "access": {
+            "type": "string",
+            "enum": [
+              "public",
+              "restricted"
+            ]
+          }
+        },
+        "required": [
+          "reference",
+          "access"
+        ],
+        "additionalProperties": false
+      },
+      "maxItems": 30
+    },
+    "defaultLicenseExpression": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500
+    },
+    "components": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          },
+          "digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "licenseExpression": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          },
+          "source": {
+            "type": "string",
+            "format": "uri"
+          },
+          "sourceVersion": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "attribution": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "aiUsage": {
+            "type": "string",
+            "enum": [
+              "none",
+              "assisted",
+              "generated",
+              "mixed",
+              "unknown"
+            ]
+          },
+          "rightsStatus": {
+            "type": "string",
+            "enum": [
+              "declared",
+              "documented",
+              "disputed",
+              "unknown"
+            ]
+          }
+        },
+        "required": [
+          "path",
+          "digest",
+          "licenseExpression",
+          "aiUsage",
+          "rightsStatus"
+        ],
+        "additionalProperties": false
+      },
+      "maxItems": 1000
+    },
+    "trainingPermission": {
+      "type": "string",
+      "enum": [
+        "not-separately-granted",
+        "explicit-grant",
+        "explicit-restriction",
+        "unknown"
+      ]
+    },
+    "hostingGrantRef": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 300
+    },
+    "commercialAgreementRefs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 300
+      },
+      "maxItems": 30
+    },
+    "jurisdictionNote": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "declarationId",
+    "declaredBy",
+    "agentCreator",
+    "authority",
+    "defaultLicenseExpression",
+    "components",
+    "trainingPermission"
+  ],
+  "additionalProperties": false,
+  "description": "權利聲明，不是平台權屬認證。其他有效法律或許可不因聲明而被推翻。",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jictemple.com/protocol/rights.schema.json"
+}

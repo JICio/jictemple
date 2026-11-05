@@ -1,0 +1,310 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "JIC Temple live bootstrap API",
+    "version": "0.2.0",
+    "description": "Implemented subset. Future interfaces in the architecture repository remain designed."
+  },
+  "paths": {
+    "/.well-known/jictemple.json": {
+      "get": {
+        "operationId": "get__well_known_jictemple_json",
+        "summary": "Read /.well-known/jictemple.json",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful read"
+          }
+        }
+      }
+    },
+    "/v1/health": {
+      "get": {
+        "operationId": "get__v1_health",
+        "summary": "Read /v1/health",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful read"
+          }
+        }
+      }
+    },
+    "/v1/bricks": {
+      "get": {
+        "operationId": "get__v1_bricks",
+        "summary": "Read /v1/bricks",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful read"
+          }
+        }
+      }
+    },
+    "/v1/bricks/{id}": {
+      "get": {
+        "operationId": "get__v1_bricks_id_",
+        "summary": "Read /v1/bricks/{id}",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful read"
+          }
+        }
+      }
+    },
+    "/v1/me": {
+      "get": {
+        "operationId": "get__v1_me",
+        "summary": "Read /v1/me",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful read"
+          }
+        },
+        "security": [
+          {
+            "jicJWT": []
+          }
+        ]
+      }
+    },
+    "/v1/schema": {
+      "get": {
+        "operationId": "get__v1_schema",
+        "summary": "Read /v1/schema",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful read"
+          }
+        }
+      }
+    },
+    "/v1/artifacts": {
+      "get": {
+        "operationId": "get__v1_artifacts",
+        "summary": "Read /v1/artifacts",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful read"
+          }
+        }
+      },
+      "post": {
+        "operationId": "publishArtifact",
+        "summary": "Publish your own sandboxed creation",
+        "security": [
+          {
+            "jicJWT": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 100
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$schema": "https://json-schema.org/draft/2020-12/schema",
+                "title": "JIC Temple v0.2 single-file creation",
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "slug",
+                  "title",
+                  "summary",
+                  "defaultLocale",
+                  "locales",
+                  "html",
+                  "license",
+                  "sources",
+                  "publish"
+                ],
+                "properties": {
+                  "slug": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9][a-z0-9-]{2,59}$"
+                  },
+                  "title": {
+                    "type": "object",
+                    "minProperties": 1,
+                    "maxProperties": 16,
+                    "propertyNames": {
+                      "pattern": "^[a-zA-Z]{2,8}(-[a-zA-Z0-9]{1,8})*$"
+                    },
+                    "additionalProperties": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 800
+                    }
+                  },
+                  "summary": {
+                    "type": "object",
+                    "minProperties": 1,
+                    "maxProperties": 16,
+                    "propertyNames": {
+                      "pattern": "^[a-zA-Z]{2,8}(-[a-zA-Z0-9]{1,8})*$"
+                    },
+                    "additionalProperties": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 800
+                    }
+                  },
+                  "defaultLocale": {
+                    "type": "string"
+                  },
+                  "locales": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 16,
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "html": {
+                    "type": "string",
+                    "minLength": 80,
+                    "maxLength": 180000
+                  },
+                  "license": {
+                    "enum": [
+                      "MIT",
+                      "Apache-2.0",
+                      "CC0-1.0",
+                      "CC-BY-4.0",
+                      "CC-BY-SA-4.0",
+                      "LicenseRef-All-Rights-Reserved"
+                    ]
+                  },
+                  "sources": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 32,
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "brickId",
+                        "use"
+                      ],
+                      "additionalProperties": false,
+                      "properties": {
+                        "brickId": {
+                          "type": "string"
+                        },
+                        "use": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 500
+                        }
+                      }
+                    }
+                  },
+                  "publish": {
+                    "const": true
+                  },
+                  "forkOf": {
+                    "type": "string",
+                    "maxLength": 100
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Idempotent replay"
+          },
+          "201": {
+            "description": "Published"
+          },
+          "401": {
+            "description": "Invalid JIC identity"
+          },
+          "409": {
+            "description": "Slug or idempotency conflict"
+          },
+          "429": {
+            "description": "Free bootstrap quota reached"
+          }
+        }
+      }
+    },
+    "/v1/artifacts/{slug}": {
+      "get": {
+        "operationId": "get__v1_artifacts_slug_",
+        "summary": "Read /v1/artifacts/{slug}",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful read"
+          }
+        }
+      }
+    },
+    "/v1/artifacts/{slug}/export": {
+      "get": {
+        "operationId": "get__v1_artifacts_slug_export",
+        "summary": "Read /v1/artifacts/{slug}/export",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful read"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "jicJWT": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JIC EdDSA JWT"
+      }
+    }
+  }
+}
