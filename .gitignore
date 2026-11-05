@@ -11,3 +11,4 @@ runtime/.sites-runtime/
 runtime/.wrangler/
 runtime/.openai/hosting.json
 runtime/wrangler.jsonc
+runtime/node_modules/
