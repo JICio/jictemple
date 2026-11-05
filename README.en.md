@@ -48,3 +48,5 @@ Deployment requires your own Site identity.
 Code is MIT licensed. Source material keeps its own license.
 Publishing a creation does not transfer its copyright to the platform.
 Read [contribution rules](CONTRIBUTING.md) and [the open ground](docs/OPEN-GROUND.md).
+
+[奧斯汀立體寺院 / Austin 3D Temple](https://jictemple.com/world/seam-court) · [地圖入口 / Map entry](https://map.jic.io/temple/)

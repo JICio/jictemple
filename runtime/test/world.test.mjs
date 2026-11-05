@@ -17,4 +17,43 @@ test('another identity cannot replace a slug',async()=>{const r=await request('/
 test('HTML is delivered with opaque sandbox and no network or core access',async()=>{const r=await request('/content/first-play');const csp=r.headers.get('content-security-policy');assert.match(csp,/sandbox allow-scripts/);assert.doesNotMatch(csp,/allow-same-origin/);assert.match(csp,/connect-src 'none'/);assert.match(csp,/form-action 'none'/);assert.match(csp,/frame-src 'none'/);assert.equal(await r.text(),sample().html);const page=await(await request('/play/first-play')).text();assert.match(page,/sandbox="allow-scripts"/);assert.doesNotMatch(page,/allow-same-origin/)});
 test('UTF-8 byte limit rejects a multibyte file below the character limit',async()=>{const r=await request('/v1/artifacts',{method:'POST',token:await jwt(),body:{...sample('oversized'),html:sample().html+'愛'.repeat(61000)},key:'oversize-001'});assert.equal(r.status,400)});
 test('per-day quota is enforced, even for parallel create attempts',async()=>{const token=await jwt();const results=await Promise.all(['second','third','fourth','fifth'].map((s,i)=>request('/v1/artifacts',{method:'POST',token,body:sample('play-'+s),key:'quota-key-'+i})));assert.equal(results.filter(r=>r.status===201).length,2);assert.equal(results.filter(r=>r.status===429).length,2)});
-test('MCP exposes the same read and identity boundary',async()=>{let r=await request('/mcp',{method:'POST',body:{jsonrpc:'2.0',id:1,method:'tools/list'}});const d=await r.json();assert.equal(d.result.tools.length,6);r=await request('/mcp',{method:'POST',body:{jsonrpc:'2.0',id:2,method:'tools/call',params:{name:'temple_me',arguments:{}}}});assert.equal((await r.json()).result.isError,true);r=await request('/mcp',{method:'POST',body:{jsonrpc:'2.0',id:3,method:'tools/call',params:{name:'temple_export',arguments:{slug:'../../secret'}}}});assert.equal((await r.json()).result.isError,true)});
+test('MCP exposes the same read and identity boundary',async()=>{let r=await request('/mcp',{method:'POST',body:{jsonrpc:'2.0',id:1,method:'tools/list'}});const d=await r.json();assert.equal(d.result.tools.length,9);r=await request('/mcp',{method:'POST',body:{jsonrpc:'2.0',id:2,method:'tools/call',params:{name:'temple_me',arguments:{}}}});assert.equal((await r.json()).result.isError,true);r=await request('/mcp',{method:'POST',body:{jsonrpc:'2.0',id:3,method:'tools/call',params:{name:'temple_export',arguments:{slug:'../../secret'}}}});assert.equal((await r.json()).result.isError,true)});
+
+
+test('persistent scenes preserve authorship, enforce cell ownership and reject stale versions',async()=>{
+ const token=await jwt(),guest=await jwt({sub:other}),scene={slug:'test-commons',title:{en:'Commons'},summary:{en:'A shared virtual scene.'},publish:true,dataLicense:'CC0-1.0',collaboration:'open-agents',spawn:[0,2,5],sources:['element-love'],blocks:[{x:0,y:0,z:0,material:'LOVE'}]};
+ let r=await request('/v1/scenes',{method:'POST',token,body:scene,key:'scene-create-001'});assert.equal(r.status,201);
+ r=await request('/v1/scenes/test-commons');let d=await r.json();assert.equal(d.blocks[0].author,subject);assert.equal(d.referenceFrame.kind,'virtual');const tag=r.headers.get('etag');
+ const denied={dataLicense:'CC0-1.0',operations:[{op:'remove',x:0,y:0,z:0}]};r=await request('/v1/scenes/test-commons/edits',{method:'POST',token:guest,body:denied,key:'scene-remove-001',headers:{'if-match':tag}});assert.equal(r.status,403);
+ const add={dataLicense:'CC0-1.0',operations:[{op:'put',x:1,y:0,z:0,material:'WISH'}]};r=await request('/v1/scenes/test-commons/edits',{method:'POST',token:guest,body:add,key:'scene-add-001',headers:{'if-match':tag}});assert.equal(r.status,200);assert.equal((await r.json()).revision,2);
+ r=await request('/v1/scenes/test-commons/edits',{method:'POST',token:guest,body:add,key:'scene-add-001',headers:{'if-match':tag}});assert.equal(r.status,200);assert.equal((await r.json()).replayed,true);
+ r=await request('/v1/scenes/test-commons/edits',{method:'POST',token,body:{dataLicense:'CC0-1.0',operations:[{op:'put',x:2,y:0,z:0,material:'TIME'}]},key:'scene-stale-001',headers:{'if-match':tag}});assert.equal(r.status,412);
+ r=await request('/v1/scenes/test-commons/export');d=await r.json();assert.equal(d.revision,2);assert.equal(d.blocks.length,2);assert.equal(d.blocks.find(b=>b.x===1).author,other);
+});
+test('concurrent scene edits cannot silently overwrite another revision',async()=>{
+ const token=await jwt();const before=await request('/v1/scenes/test-commons'),tag=before.headers.get('etag');
+ const edits=[3,4].map(x=>request('/v1/scenes/test-commons/edits',{method:'POST',token,body:{dataLicense:'CC0-1.0',operations:[{op:'put',x,y:0,z:0,material:'TIME'}]},key:'scene-race-'+x,headers:{'if-match':tag}}));
+ const results=await Promise.all(edits);assert.deepEqual(results.map(r=>r.status).sort(),[200,412]);
+ const scene=await(await request('/v1/scenes/test-commons')).json();assert.equal(scene.blocks.length,3);assert.equal(scene.revision,3);
+});
+
+test('scene validation is public, has no publication side effect and checks spawn collision',async()=>{
+ const scene={slug:'validation-only',title:{en:'Preview'},summary:{en:'Preview'},publish:true,dataLicense:'CC0-1.0',collaboration:'open-agents',spawn:[0,2,5],sources:['element-love'],blocks:[{x:0,y:0,z:0,material:'LOVE'}]};
+ let r=await request('/v1/scenes/validate',{method:'POST',body:scene});assert.equal(r.status,200);assert.equal((await r.json()).cells,1);assert.equal((await request('/v1/scenes/validation-only')).status,404);
+ r=await request('/v1/scenes/validate',{method:'POST',body:{...scene,spawn:[.5,1.7,.5]}});assert.equal(r.status,400);
+ r=await request('/v1/scenes/validate',{method:'POST',body:{...scene,sources:['element-invented']}});assert.equal(r.status,400);
+});
+test('scene history is immutable and landmark responses are public, attributed and idempotent',async()=>{
+ let r=await request('/v1/scenes/test-commons/revisions/1');const first=await r.json();assert.equal(first.blocks.length,1);assert.equal(first.revision,1);
+ r=await request('/v1/scenes/test-commons/revisions');assert.equal((await r.json()).items.length,3);
+ const token=await jwt(),scene={slug:'landmark-world',title:{en:'Views'},summary:{en:'Views'},publish:true,dataLicense:'CC0-1.0',collaboration:'open-agents',sources:['element-space'],blocks:[],landmarks:[{position:[0,1,0],title:{en:'A question'},body:{en:'A revisable claim.'}}],buildZones:[{id:'guest',min:[5,0,5],max:[8,4,8]}]};
+ r=await request('/v1/scenes',{method:'POST',token,body:scene,key:'landmark-create-001'});assert.equal(r.status,201);
+ const response={landmark:0,text:'I have a different view.',links:['https://jic.io/'],publish:true};
+ r=await request('/v1/scenes/landmark-world/responses',{method:'POST',body:response});assert.equal(r.status,401);
+ r=await request('/v1/scenes/landmark-world/responses',{method:'POST',token,body:response,key:'landmark-response-001'});assert.equal(r.status,201);const made=await r.json();
+ r=await request('/v1/scenes/landmark-world/responses',{method:'POST',token,body:response,key:'landmark-response-001'});assert.equal((await r.json()).id,made.id);
+ r=await request('/v1/scenes/landmark-world/responses');const list=await r.json();assert.equal(list.items.length,1);assert.equal(list.items[0].actor,subject);
+ const guest=await jwt({sub:other});const edit=x=>({dataLicense:'CC0-1.0',operations:[{op:'put',x,y:0,z:6,material:'WISH'}]});
+ r=await request('/v1/scenes/landmark-world/edits',{method:'POST',token:guest,body:edit(2),key:'outside-zone-001',headers:{'if-match':'"scene-1"'}});assert.equal(r.status,403);
+ r=await request('/v1/scenes/landmark-world/edits',{method:'POST',token:guest,body:edit(6),key:'inside-zone-001',headers:{'if-match':'"scene-1"'}});assert.equal(r.status,200);
+});

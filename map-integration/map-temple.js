@@ -1,0 +1,21 @@
+/* JIC Temple entry and source-coordinate overlay. No payment or GPS operations. */
+(()=>{
+ const world=typeof map!=='undefined'?map:null;if(!world||!window.maplibregl)return;
+ const translations={zh:['🏛 JIC Temple · 奥斯汀 →','虚拟基地 · 城市参考点','进入 Agent 建造的立体寺院','来源坐标 · 尚未接入3D模型'], 'zh-Hant':['🏛 JIC Temple · 奧斯汀 →','虛擬基地 · 城市參考點','進入 Agent 建造的立體寺院','來源座標 · 尚未接入3D模型'], en:['🏛 JIC Temple · Austin →','Virtual base · city reference','Enter the agent-built 3D temple','Source coordinates · no model ingested']};
+ const lang=()=>document.documentElement.lang;const text=()=>translations[lang()]||translations.en;
+ const entry=document.createElement('a');entry.id='jic-temple-entry';entry.href='/temple/';entry.style.cssText='display:block;margin:10px 0 4px;padding:10px 12px;border:1px solid #d1b76388;border-radius:9px;background:#d1b7631a;color:#eed496;font-weight:700;font-size:12px;text-decoration:none';
+ const panel=document.getElementById('left');if(panel){const target=document.getElementById('citySwitch');if(target)target.after(entry);else panel.append(entry)}
+ function labels(){entry.textContent=text()[0]}labels();new MutationObserver(labels).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
+ function paragraph(value){const p=document.createElement('p');p.textContent=value;p.style.cssText='font-size:12px;line-height:1.7;color:#28332d;margin:8px 0';return p}
+ function popup(){const box=document.createElement('div'),h=document.createElement('strong'),a=document.createElement('a');h.textContent='JIC Temple · Austin';h.style.color='#26322d';a.href='/temple/';a.textContent=text()[2]+' ↗';a.style.cssText='color:#8a5c22;font-weight:700';box.append(h,paragraph(text()[1]),paragraph('30.2672, −97.7431'),a);return box}
+ const pin=document.createElement('button');pin.textContent='⌂';pin.setAttribute('aria-label','JIC Temple Austin virtual base');pin.style.cssText='width:36px;height:36px;border-radius:50%;background:#e7c970;color:#24332f;border:2px solid #fff9;font-size:23px;cursor:pointer;box-shadow:0 3px 16px #0007';
+ const marker=new maplibregl.Marker({element:pin}).setLngLat([-97.7431,30.2672]).setPopup(new maplibregl.Popup({offset:24}).setDOMContent(popup())).addTo(world);pin.addEventListener('click',()=>marker.getPopup().setDOMContent(popup()));
+ const ready=()=>{if(world.getSource('jic-temple-catalog'))return;world.addSource('jic-temple-catalog',{type:'geojson',data:'/temple/catalog/austin.geojson',cluster:true,clusterRadius:35,clusterMaxZoom:13});
+ world.addLayer({id:'jic-temple-catalog-clusters',type:'circle',source:'jic-temple-catalog',filter:['has','point_count'],paint:{'circle-radius':18,'circle-color':'#c4b9d8','circle-opacity':.85,'circle-stroke-color':'#fff','circle-stroke-width':1}});
+ world.addLayer({id:'jic-temple-catalog-count',type:'symbol',source:'jic-temple-catalog',filter:['has','point_count'],layout:{'text-field':'{point_count_abbreviated}','text-size':11},paint:{'text-color':'#26322d'}});
+ world.addLayer({id:'jic-temple-catalog-points',type:'circle',source:'jic-temple-catalog',filter:['!',['has','point_count']],paint:{'circle-radius':6,'circle-color':['match',['get','category'],'church','#bfa6ed','house','#e7bd81','#a2c6ae'],'circle-stroke-color':'#fff','circle-stroke-width':1}});
+ world.on('click','jic-temple-catalog-points',e=>{const f=e.features?.[0];if(!f)return;const p=f.properties,box=document.createElement('div'),h=document.createElement('strong'),link=document.createElement('a');h.style.color='#26322d';h.textContent=lang()==='en'?p.titleEn:p.title;link.textContent='JIC '+p.category+' ↗';link.href=p.portal;link.target='_blank';link.rel='noopener';link.style.color='#805c28';box.append(h,paragraph(text()[3]),link);new maplibregl.Popup().setLngLat(e.lngLat).setDOMContent(box).addTo(world)});
+ world.on('mouseenter','jic-temple-catalog-points',()=>world.getCanvas().style.cursor='pointer');world.on('mouseleave','jic-temple-catalog-points',()=>world.getCanvas().style.cursor='');
+ if(new URLSearchParams(location.search).get('temple')==='austin'){world.flyTo({center:[-97.7431,30.2672],zoom:14.7,pitch:50,duration:1200});marker.togglePopup()}
+ };if(world.isStyleLoaded())ready();else world.once('load',ready);
+})();

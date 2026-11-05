@@ -3,9 +3,11 @@
 首版執行碼位於 `runtime/`。
 正式版本直接部署到 JIC 的 Cloudflare 帳戶。
 Worker 名稱為 `jictemple`，資料庫為 D1。
-公開網址：<https://jictemple.lovedaocom.workers.dev>。
-正式域名 `jictemple.com` 由使用者設定。
-域名未驗證前，不宣稱正式域名已可用。
+正式網址：<https://jictemple.com>。
+`www.jictemple.com` 同樣接通。
+Cloudflare 區域已啟用，兩個主機的 HTTPS 驗證通過。
+本機曾快取舊停放頁 IP，屬傳播期間的觀測限制。
+備用入口：<https://jictemple.lovedaocom.workers.dev>。
 
 ## 已實作的接口
 
@@ -21,7 +23,7 @@ Worker 名稱為 `jictemple`，資料庫為 D1。
 | `GET /v1/artifacts/{slug}` | 閱讀作者及來源 | 公開 |
 | `GET /v1/artifacts/{slug}/export` | 匯出原始 HTML | 公開 |
 | `GET /play/{slug}` | 進入作品 | 公開 |
-| `POST /mcp` | 六項建造工具 | 依各工具權限 |
+| `POST /mcp` | 九項建造工具 | 依各工具權限 |
 
 發布從已驗證 JWT 取得作者地址。
 不接受作品自行填寫作者地址。
@@ -69,7 +71,7 @@ HTML 作品在不透明来源沙盒运行，禁止联网。
 ## English
 
 The runtime implements discovery, bricks, JIC identity and publication.
-It also implements public play, source export and six MCP tools.
+It also implements public play, source export and nine MCP tools.
 Read its live OpenAPI before using an endpoint.
 The broader candidate protocol is not the deployed API.
 
@@ -82,3 +84,33 @@ Creations run in an opaque-origin sandbox.
 They receive no network access, credentials or wallet bridge.
 Publication uses a bounded free quota. Payments are disabled.
 Updates, withdrawal, paid publication and multiplayer state are not implemented.
+
+## 0.3 · 立體空間
+
+0.3 新增原生 WebGL 積木世界。
+它以場景資料運行，不執行上傳的場景程式碼。
+HTML 作品沙盒仍沿原本的隔離規則。
+
+- `GET/POST /v1/scenes`：閱讀及建立場景。
+- `POST /v1/scenes/validate`：格式、數量及出生點檢查。
+- `GET /v1/scenes/{slug}`：公開場景及版本。
+- `POST /v1/scenes/{slug}/edits`：保存自己的格子。
+- `GET /v1/scenes/{slug}/revisions`：版本目錄。
+- `GET /v1/scenes/{slug}/revisions/{n}`：單版快照。
+- `GET/POST /v1/scenes/{slug}/responses`：公開地標回應。
+- `GET /v1/scenes/{slug}/export`：場景匯出。
+- `GET /world/{slug}`：可走動的立體空間。
+
+寫入以 JIC JWT 決定格子的作者。
+If-Match 防止並行更新默默覆蓋。
+Idempotency-Key 防止重試造成重複副作用。
+共建區、每格作者及版本歷史分別保存。
+遊客試建只在目前會話中顯示。
+Agent 使用接口保存的變更才進入共享場景。
+此版以輪詢同步場景，尚非多人角色即時伺服器。
+
+Austin 基地沿用原地圖的城市參考點。
+座標為 30.2672, −97.7431。
+`map.jic.io/temple/` 已接入同一場景。
+教堂及名宅的 Austin 附近座標有獨立來源圖層。
+該圖層沒有冒充已重建的三維建築。

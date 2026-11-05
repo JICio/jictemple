@@ -1,0 +1,74 @@
+{
+  "source": "https://u.jic.io/v1/router",
+  "observedAt": "2026-11-05 UTC",
+  "evidenceKind": "public-api-configuration-not-chain-execution",
+  "chainId": 8453,
+  "version": "1.4",
+  "address": "0xF3584E339FC3C18B05604555e735Bf9551d33797",
+  "constitution": {
+    "version": "1.3",
+    "ratified": "2026-09-26",
+    "rules": {
+      "topup": {
+        "split": {
+          "vault": 10000
+        },
+        "note": "充值=存钱,100% 进金库,0 抽成;推荐激励只能平台储备额外发"
+      },
+      "consume": {
+        "split": {
+          "vault": 8000,
+          "referrer": 1000,
+          "platform": 1000
+        },
+        "note": "付给协议(买名/主题/锚点/封存)"
+      },
+      "pay": {
+        "split": {
+          "payee": "max 7000",
+          "referrer": 1000,
+          "platform": 1000,
+          "vault": "min 1000"
+        },
+        "note": "付给任何人;收款人盘子内部(合著/血缘/托管/成本)产品自定,用 payMany 列出"
+      },
+      "lineage": {
+        "bps": [
+          1000,
+          300,
+          100,
+          50
+        ],
+        "note": "内容血缘 L1–L4 版税,在收款人盘子内;缺位并入 consume"
+      }
+    },
+    "pools": {
+      "rule": "payer-take-out ≤ payer-put-in",
+      "returnsFrom": [
+        "attention",
+        "curator-share-on-claim",
+        "referral-on-real-consumption",
+        "nav-from-consume"
+      ],
+      "note": "投放是下注发现权(正主来认领,策展人拿 10%),不是买一份收益权"
+    },
+    "invariants": [
+      "任何池:投放者从池里拿回的 ≤ 投入;回报只能来自池外。做不到就是庞氏",
+      "推荐 10% 固定;平台 10% 固定;consume ≥10% 地板;收款人 ≤70% 上限",
+      "人的推荐链只有一层。内容血缘可以多层(作品引用作品是客观事实),人拉人不行 —— 多层就是传销结构",
+      "平台当收款人时(自营产品)不另抽 platformBps:同一笔钱里平台只出现一次,空出的 10% 归 vault",
+      "无推荐人时推荐份额归平台",
+      "当场原子结算,合约不留钱;swap/转账不经 Router 不分;禁 payee==payer",
+      "参数只在 Router 一处调,站点链上跟随,不硬编码"
+    ],
+    "enforced": {
+      "contract": "v1.3",
+      "splitBps": 1000,
+      "minConsumeBps": 1000,
+      "maxPayeeBps": 7000,
+      "platformBps": 1000
+    },
+    "pending": null
+  },
+  "paymentTested": false
+}

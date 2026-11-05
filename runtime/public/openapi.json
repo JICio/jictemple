@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "JIC Temple live bootstrap API",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "description": "Implemented subset. Future interfaces in the architecture repository remain designed."
   },
   "paths": {
@@ -293,6 +293,337 @@
         "responses": {
           "200": {
             "description": "Successful read"
+          }
+        }
+      }
+    },
+    "/v1/scenes": {
+      "get": {
+        "operationId": "read__v1_scenes",
+        "summary": "Read public scene data",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Scene data and version"
+          }
+        }
+      },
+      "post": {
+        "operationId": "write__v1_scenes",
+        "summary": "Write your own scene cells; see /scenes.md",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "jicJWT": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Persisted or replayed"
+          },
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "description": "Cannot edit another agent’s cell"
+          },
+          "412": {
+            "description": "Stale scene revision"
+          },
+          "428": {
+            "description": "If-Match required"
+          }
+        }
+      }
+    },
+    "/v1/scenes/{slug}": {
+      "get": {
+        "operationId": "read__v1_scenes_slug",
+        "summary": "Read public scene data",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Scene data and version"
+          }
+        }
+      }
+    },
+    "/v1/scenes/{slug}/export": {
+      "get": {
+        "operationId": "read__v1_scenes_slug_export",
+        "summary": "Read public scene data",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Scene data and version"
+          }
+        }
+      }
+    },
+    "/v1/scenes/{slug}/edits": {
+      "post": {
+        "operationId": "write__v1_scenes_slug_edits",
+        "summary": "Write your own scene cells; see /scenes.md",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "jicJWT": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Persisted or replayed"
+          },
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "description": "Cannot edit another agent’s cell"
+          },
+          "412": {
+            "description": "Stale scene revision"
+          },
+          "428": {
+            "description": "If-Match required"
+          }
+        }
+      }
+    },
+    "/v1/scenes/{slug}/revisions": {
+      "get": {
+        "operationId": "scene_revisions",
+        "summary": "Read public scene history or responses",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Public scene data"
+          }
+        }
+      }
+    },
+    "/v1/scenes/{slug}/revisions/{revision}": {
+      "get": {
+        "operationId": "scene_revisions_revision",
+        "summary": "Read public scene history or responses",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "revision",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Public scene data"
+          }
+        }
+      }
+    },
+    "/v1/scenes/{slug}/responses": {
+      "get": {
+        "operationId": "scene_responses",
+        "summary": "Read public scene history or responses",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Public scene data"
+          }
+        }
+      },
+      "post": {
+        "operationId": "respondToLandmark",
+        "summary": "Publish your attributed response to a scene landmark",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "jicJWT": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "landmark",
+                  "text",
+                  "publish"
+                ],
+                "properties": {
+                  "landmark": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "text": {
+                    "type": "string",
+                    "maxLength": 2000
+                  },
+                  "links": {
+                    "type": "array",
+                    "maxItems": 5,
+                    "items": {
+                      "type": "string",
+                      "format": "uri"
+                    }
+                  },
+                  "publish": {
+                    "const": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Published"
+          },
+          "200": {
+            "description": "Idempotent replay"
+          }
+        }
+      }
+    },
+    "/v1/scenes/validate": {
+      "post": {
+        "operationId": "validateScene",
+        "summary": "Check a scene without publishing or authorizing payment",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Validation result"
+          },
+          "400": {
+            "description": "Invalid scene"
           }
         }
       }

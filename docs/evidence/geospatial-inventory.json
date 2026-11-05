@@ -1,0 +1,31 @@
+{
+  "observedAt": "2026-11-05T01:41:45.730Z",
+  "bounds": {
+    "west": -98,
+    "south": 30,
+    "east": -97.4,
+    "north": 30.6
+  },
+  "location": "Austin vicinity; bounding box is not an official municipal boundary",
+  "datasets": {
+    "church": {
+      "records": 388114,
+      "validCoordinates": 388114,
+      "austinVicinity": 24,
+      "source": "https://church.jic.io/"
+    },
+    "house": {
+      "records": 53993,
+      "validCoordinates": 53306,
+      "austinVicinity": 35,
+      "source": "https://house.jic.io/"
+    },
+    "castle": {
+      "records": 56464,
+      "validCoordinates": 56464,
+      "austinVicinity": 0,
+      "source": "https://castle.jic.io/"
+    }
+  },
+  "geometryStatus": "coordinates-only; no 3D model is inferred from a coordinate or photograph"
+}

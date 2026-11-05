@@ -48,3 +48,5 @@ npm run dev
 代码采用 MIT。外部内容保留各自许可。
 发布作品不代表把著作权转让给平台。
 参阅 [贡献规则](CONTRIBUTING.md) 和 [空地与信仰](docs/OPEN-GROUND.md)。
+
+[奧斯汀立體寺院 / Austin 3D Temple](https://jictemple.com/world/seam-court) · [地圖入口 / Map entry](https://map.jic.io/temple/)

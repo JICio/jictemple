@@ -1,3 +1,4 @@
+import {sceneAPI} from './scenes.js';
 import {HttpError,boundedJSON,verifyJIC} from './auth.js';
 import {BRICKS} from './bricks.js';
 import {VERSION,LOCALES,ARTIFACT_SCHEMA,discovery,embeddedArtifactSchema} from './contracts.js';
@@ -36,7 +37,7 @@ export async function api(req,env,path){
   if(path==='/v1/bricks')return json({items:BRICKS,locales:LOCALES,notice:'Reuse facts and formulas. Linked source texts retain their own terms. Source-only entries contain no source text.'});
   const brick=path.match(/^\/v1\/bricks\/([a-z0-9-]+)$/);if(brick){const value=BRICKS.find(x=>x.id===brick[1]);if(!value)throw new HttpError(404,'brick_not_found','Brick not found.');return json(value)}
   if(path==='/v1/schema')return json(ARTIFACT_SCHEMA);
-  if(path==='/v1/me')return json({identity:await verifyJIC(req),scope:['artifact:create:own','artifact:export:public'],paymentAuthority:false});
+  if(path==='/v1/me')return json({identity:await verifyJIC(req),scope:['artifact:create:own','artifact:export:public','scene:create:own','scene:edit:own-cells','scene:respond'],paymentAuthority:false});
   if(path==='/v1/artifacts'){
    const cursor=url.searchParams.get('cursor')||'';check(!cursor||/^jt_[a-f0-9-]{36}$/.test(cursor),'invalid_cursor','Invalid cursor.');
    const rows=await database(env).prepare('SELECT id,slug,author,author_name,title,summary,default_locale,locales,license,sources,fork_of,html_sha256,created_at FROM world_artifacts WHERE id>? ORDER BY id LIMIT 31').bind(cursor).all();
@@ -66,6 +67,9 @@ export async function api(req,env,path){
  throw new HttpError(404,'endpoint_not_found','This endpoint is not implemented. Read /.well-known/jictemple.json.');
 }
 const TOOLS=[
+ {name:'temple_scene_read',description:'Read a persistent voxel scene and its version.',inputSchema:{type:'object',required:['slug'],properties:{slug:{type:'string'}},additionalProperties:false},method:'GET',path:'/v1/scenes/{slug}'},
+ {name:'temple_scene_create',description:'Create your own public voxel scene with a JIC JWT. See /scenes.md.',inputSchema:{type:'object',required:['scene','idempotencyKey'],properties:{scene:{type:'object'},idempotencyKey:{type:'string'}},additionalProperties:false},method:'POST',path:'/v1/scenes'},
+ {name:'temple_scene_edit',description:'Edit your own cells with If-Match version control. See /scenes.md.',inputSchema:{type:'object',required:['slug','edit','ifMatch','idempotencyKey'],properties:{slug:{type:'string'},edit:{type:'object'},ifMatch:{type:'string'},idempotencyKey:{type:'string'}},additionalProperties:false},method:'POST',path:'/v1/scenes/{slug}/edits'},
  {name:'temple_discover',description:'Discover the live world and its boundaries.',inputSchema:{type:'object',properties:{},additionalProperties:false},method:'GET',path:'/.well-known/jictemple.json'},
  {name:'temple_bricks',description:'Read reusable JIC primitives and source references.',inputSchema:{type:'object',properties:{},additionalProperties:false},method:'GET',path:'/v1/bricks'},
  {name:'temple_me',description:'Verify your own JIC identity. No payment authority is granted.',inputSchema:{type:'object',properties:{},additionalProperties:false},method:'GET',path:'/v1/me'},
@@ -83,7 +87,7 @@ async function mcp(req,env){
  else if(b.method==='ping')result={};
  else if(b.method==='tools/list')result={tools:TOOLS.map(({name,description,inputSchema})=>({name,description,inputSchema}))};
  else if(b.method==='tools/call'){
-  try{const t=TOOLS.find(x=>x.name===b.params?.name);if(!t)throw new HttpError(404,'unknown_tool','Unknown tool.');const args=b.params?.arguments||{};let path=t.path;if(path.includes('{slug}')){check(typeof args.slug==='string'&&/^[a-z0-9][a-z0-9-]{2,59}$/.test(args.slug),'invalid_slug','Invalid slug.');path=path.replace('{slug}',args.slug)}const headers=new Headers(req.headers);headers.set('content-type','application/json');if(t.method==='POST')headers.set('idempotency-key',args.idempotencyKey||'');const r=path==='/.well-known/jictemple.json'?json(discovery(new URL(req.url).origin)):await api(new Request(new URL(path,req.url),{method:t.method,headers,...(t.method==='POST'?{body:JSON.stringify(args.artifact||{})}:{})}),env,path);result={content:[{type:'text',text:await r.text()}],isError:!r.ok};}catch(e){if(!(e instanceof HttpError))throw e;result={content:[{type:'text',text:JSON.stringify({error:{code:e.code,message:e.message}})}],isError:true}}
+  try{const t=TOOLS.find(x=>x.name===b.params?.name);if(!t)throw new HttpError(404,'unknown_tool','Unknown tool.');const args=b.params?.arguments||{};let path=t.path;if(path.includes('{slug}')){check(typeof args.slug==='string'&&/^[a-z0-9][a-z0-9-]{2,59}$/.test(args.slug),'invalid_slug','Invalid slug.');path=path.replace('{slug}',args.slug)}const headers=new Headers(req.headers);headers.set('content-type','application/json');if(t.method==='POST')headers.set('idempotency-key',args.idempotencyKey||'');if(args.ifMatch)headers.set('if-match',args.ifMatch);const r=path==='/.well-known/jictemple.json'?json(discovery(new URL(req.url).origin)):await (path.startsWith('/v1/scenes')?sceneAPI:api)(new Request(new URL(path,req.url),{method:t.method,headers,...(t.method==='POST'?{body:JSON.stringify(args.artifact||args.scene||args.edit||{})}:{})}),env,path);result={content:[{type:'text',text:await r.text()}],isError:!r.ok};}catch(e){if(!(e instanceof HttpError))throw e;result={content:[{type:'text',text:JSON.stringify({error:{code:e.code,message:e.message}})}],isError:true}}
  }else return json({jsonrpc:'2.0',id:b.id??null,error:{code:-32601,message:'Method not found'}});
  return json({jsonrpc:'2.0',id:b.id??null,result});
 }
@@ -93,6 +97,7 @@ export default {async fetch(req,env,ctx){
   if(req.headers.get('origin')&&req.headers.get('origin')!==url.origin&&!['GET','HEAD'].includes(req.method))throw new HttpError(403,'cross_origin_write','Cross-origin writes are not permitted.');
   if(path==='/.well-known/jictemple.json'&&req.method==='GET')return json(discovery(url.origin));
   if(path==='/mcp')return await mcp(req,env);
+  if(path.startsWith('/v1/scenes'))return await sceneAPI(req,env,path);
   if(path.startsWith('/v1/'))return await api(req,env,path);
   const content=path.match(/^\/content\/([a-z0-9-]+)$/);
   if(content&&['GET','HEAD'].includes(req.method)){

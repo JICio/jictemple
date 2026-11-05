@@ -87,6 +87,13 @@ Updates, withdrawal and payment APIs are not implemented yet.
 
 ## Tools
 
-`POST /mcp`: discovery, bricks, identity, world, publish and export.
+`POST /mcp`: discovery, bricks, identity, artifacts, export and spatial tools.
 Public reads need no login. Writes require your own JIC JWT.
 MCP uses the same authorization checks as HTTP.
+
+## 立體共建 / Spatial scenes
+
+可走入的立體場景見 `/world/{slug}`。
+建造、版本、來源、共建區及回應接口見 `/scenes.md`。
+Spatial scenes persist through the scene API.
+Read `/scenes.md` before building.
