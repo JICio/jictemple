@@ -139,3 +139,21 @@ test('agents can meditate and chant fixed texts; anonymous visitors appear as li
  const statuses=[];for(let i=0;i<31;i++)statuses.push((await visit({position:[1.5,0,30.5]},'c'.repeat(32))).status);assert.ok(statuses.includes(429));
  assert.equal((await request('/v1/visitors/presence',{method:'POST',body:{visitorKey:key,scene:'zixiao-palace',position:[0.5,0,30.5],publish:true},headers:{origin:'https://evil.test'}})).status,403);
 });
+test('realistic view serves local modules with the existing strict CSP',async()=>{
+ for(const slug of ['zixiao-palace','another-world']){const r=await request('/real/'+slug);assert.equal(r.status,200);assert.match(r.headers.get('content-type'),/text\/html/);assert.match(r.headers.get('content-security-policy'),/script-src 'self';/);assert.match(await r.text(),/<script type="module" src="\/real.js"><\/script>/)}
+ for(const path of ['/real.js','/vendor/three.module.min.js']){const r=await request(path);assert.equal(r.status,200);assert.match(r.headers.get('content-type'),/javascript/);const s=await r.text();assert.doesNotMatch(s,/(?:\bfrom\s*|\bimport\s*\(?\s*)['"]https?:\/\//)}
+ for(const file of (await readdir('public',{recursive:true})).filter(f=>/\.(?:js|html)$/.test(f))){const s=await readFile('public/'+file,'utf8');assert.doesNotMatch(s,/(?:\bfrom\s*|\bimport\s*\(?\s*)['"]https?:\/\//,file);assert.doesNotMatch(s,/<script[^>]+src=['"]https?:\/\//,file)}
+ assert.equal((await request('/real.css')).status,200);assert.equal((await request('/vendor/three.LICENSE.txt')).status,200);
+ const voxel=await(await request('/voxel.js')).text();assert.match(voxel,/slug!=='zixiao-palace'/);assert.match(voxel,/Realistic view/);
+});
+test('realistic foot collision and stepped walking agree with server validation',async()=>{resetMock();
+ const src=await readFile('public/real.js','utf8'),d=await(await request('/v1/scenes/zixiao-palace')).json(),cells=new Map(d.blocks.map(b=>[`${b.x},${b.y},${b.z}`,b]));
+ const free=new Function('cells',src.slice(src.indexOf('function free('),src.indexOf('function physics('))+';return free')(cells);
+ for(const [x,y,z,expected] of [[.5,0,30.5,true],[.5,2,26.5,true],[.5,0,26.5,false],[3,1,7,true],[3,2,-4,true],[8,3,-27,true],[0,5,-11.5,true],[-4.5,5,-15,false],[0,0,32,false]]){assert.equal(free(x,y,z),expected,JSON.stringify([x,y,z]));if(expected){const r=await request('/v1/visitors/presence',{method:'POST',body:{visitorKey:'d'.repeat(32),scene:'zixiao-palace',position:[x,y,z],yaw:0,action:'idle',publish:true}});assert.equal(r.status,200,JSON.stringify([x,y,z]))}}
+ // Simulate approach to the first terrace with the actual movement function.
+ const simulate=new Function('free',`let data={},mode='third',pos=[7.5,0,10],yaw=0,vy=0,grounded=true,joy=[0,0];const keys=new Set(['KeyW']),me={action:'idle'};function ui(){};${src.slice(src.indexOf('function physics('),src.indexOf('let reporting=false;'))};for(let i=0;i<90;i++){physics(1/60);if(!free(...pos))throw Error('Movement entered solid space')}return pos;`);
+ const walked=simulate(free);assert.equal(walked[1],1);assert.ok(walked[2]<8);
+ const accepted=await request('/v1/visitors/presence',{method:'POST',body:{visitorKey:'e'.repeat(32),scene:'zixiao-palace',position:walked,yaw:0,action:'idle',publish:true}});assert.equal(accepted.status,200);
+ // An edit in a previously clear location immediately becomes collision geometry.
+ cells.set('0,0,30',{x:0,y:0,z:30});assert.equal(free(.5,0,30.5),false);
+});
