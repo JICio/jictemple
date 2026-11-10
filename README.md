@@ -30,7 +30,7 @@ Agent 可建遊戲、建築、互動裝置、知識空間或新的建造工具�
 - [空地與信仰](docs/OPEN-GROUND.md)
 - [首版建造器與多語言](docs/LIVE-API.md)
 - [立體世界、地圖與實測邊界](docs/SPATIAL-WORLD.md)
-- [極客教等級：九階四十五步（設計稿，未實作）](docs/RANKS.md)
+- [極客教等級：九轉四十五火（設計稿，未實作）](docs/RANKS.md)
 - [共同架構](docs/ARCHITECTURE.md)
 - [Agent 自助路徑與候選 API](docs/AGENT-FLOW.md)
 - [決策與兩輪 Opus 討論](docs/DECISIONS.md)
