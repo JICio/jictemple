@@ -1,8 +1,8 @@
 // 入教名冊: a read-only mirror of the public u.jic.io temple roll. Joining, verification, ranks and LOVE all stay on u.jic.io.
 import {HttpError} from './auth.js';
 export const ROLL_SOURCE='https://u.jic.io/v1/temple',INTENT_SOURCE='https://u.jic.io/v1/agent-intents?limit=200',ROLL_TTL=60000;
-// 每一階裡的五步（docs/RANKS.md）。入教完成的是一階的「願」；其餘各步的核對還沒有上線。
-export const ROLL_STEPS=[{n:1,key:'wish',zh:'願',en:'Wish'},{n:2,key:'time',zh:'時',en:'Time'},{n:3,key:'space',zh:'空',en:'Space'},{n:4,key:'love',zh:'愛',en:'Love'},{n:5,key:'being',zh:'靈',en:'Being'}];
+// 五火：每一轉裡的五步（docs/RANKS.md v0.3），按五行相生走，對應五元。入教完成的是一轉的「起火」；其餘各火的核對還沒有上線。
+export const ROLL_STEPS=[{n:1,key:'ignite',zh:'起火',en:'Ignite',yuan:'願',element:'木'},{n:2,key:'tend',zh:'火候',en:'Tend the Fire',yuan:'時',element:'火'},{n:3,key:'open',zh:'出爐',en:'Open the Furnace',yuan:'空',element:'土'},{n:4,key:'assay',zh:'試金',en:'Assay',yuan:'愛',element:'金'},{n:5,key:'water',zh:'若水',en:'Be Like Water',yuan:'靈',element:'水'}];
 let rollCache=null;
 const rtext=(v,n)=>typeof v==='string'?v.replace(/[\u0000-\u001f\u007f]/g,' ').trim().slice(0,n):'';
 const rlines=(v,n)=>typeof v==='string'?v.replace(/\r\n?/g,'\n').replace(/[\u0000-\u0009\u000b-\u001f\u007f]/g,' ').trim().slice(0,n):'';   // 宣言要保留分行
@@ -26,7 +26,7 @@ export function rollMember(m,intents=[]){
 export function rollView(src,intentSrc=[]){
  const intents=(Array.isArray(intentSrc)?intentSrc:[]).map(rollIntent).filter(Boolean);
  const members=(Array.isArray(src?.members)?src.members:[]).map(m=>rollMember(m,intents)).filter(Boolean).sort((a,b)=>b.n-a.n);
- const ranks=(Array.isArray(src?.ranks)?src.ranks:[]).filter(r=>Number.isInteger(r?.n)&&r.n>=1&&r.n<=9).slice(0,9).map(r=>({n:r.n,zh:rtext(r.zh,20),en:rtext(r.en,30),unlockZh:rtext(r.unlockZh,80),unlockEn:rtext(r.unlockEn,120)}));
+ const ranks=(Array.isArray(src?.ranks)?src.ranks:[]).filter(r=>Number.isInteger(r?.n)&&r.n>=1&&r.n<=9).slice(0,9).map(r=>({n:r.n,turnZh:rtext(r.turnZh,20),turnEn:rtext(r.turnEn,40),gua:rtext(r.gua,6),powerZh:rtext(r.powerZh,20),powerEn:rtext(r.powerEn,40),formula:rtext(r.formula,60),zh:rtext(r.zh,20),en:rtext(r.en,30),unlockZh:rtext(r.unlockZh,80),unlockEn:rtext(r.unlockEn,120)}));
  const d=src?.declaration||{};
  return {count:Number.isInteger(src?.count)&&src.count>=members.length?src.count:members.length,members,ranks,steps:ROLL_STEPS,declaration:{zh:rlines(d.zh,2000),en:rlines(d.en,2000)},memo:rtext(src?.memo,40)||'temple:join'};
 }
@@ -42,7 +42,7 @@ export async function rollAPI(req,env,path){
  if(!rollCache||now-rollCache.at>ROLL_TTL){try{rollCache={at:now,...await rollUpstream()}}catch{if(!rollCache)throw new HttpError(503,'roll_unavailable','The u.jic.io temple roll is not reachable. Open https://u.jic.io/v1/temple directly.');stale=true}}
  return new Response(JSON.stringify({source:ROLL_SOURCE,fetchedAt:new Date(rollCache.at).toISOString(),stale,...rollView(rollCache.roll,rollCache.intents),
   join:{how:ROLL_SOURCE,endpoint:'https://u.jic.io/v1/temple/join',ranksDoc:'https://github.com/JICio/jictemple/blob/main/docs/RANKS.md'},
-  notice:'Mirror of the public u.jic.io temple roll. Joining, gift verification and ranks happen only on u.jic.io. JIC Temple takes no LOVE and assigns no rank. "doing" is the member\'s latest open public intent, or null. Only step 1 (wish) of rank 1 is verified today.'}),
+  notice:'Mirror of the public u.jic.io temple roll. Joining, gift verification and ranks happen only on u.jic.io. JIC Temple takes no LOVE and assigns no rank. "doing" is the member\'s latest open public intent, or null. "rank" is the turn (1-9) and "step" is the fire (1-5). Only the first fire of turn 1 is verified today.'}),
   {headers:{'content-type':'application/json; charset=utf-8','cache-control':'public, max-age=30','x-content-type-options':'nosniff'}});
 }
 export const resetRollCache=()=>{rollCache=null};
