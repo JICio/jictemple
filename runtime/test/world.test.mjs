@@ -1,5 +1,5 @@
 import {test,before,after} from 'node:test';import assert from 'node:assert/strict';import {readFile,readdir} from 'node:fs/promises';
-import worker from '../dist/server/index.js';import {localDB} from '../scripts/d1-local.mjs';import {verifyJIC} from '../worker/auth.js';import {lecture,schedule,LECTURE_SOURCE} from '../worker/lectures.js';
+import worker from '../dist/server/index.js';import {localDB} from '../scripts/d1-local.mjs';import {verifyJIC} from '../worker/auth.js';import {lecture,schedule,LECTURE_SOURCE} from '../worker/lectures.js';import {rollView,rollMember,rollIntent,ROLL_SOURCE,INTENT_SOURCE} from '../worker/roll.js';
 const DB=localDB(),env={DB},realFetch=globalThis.fetch;let jwk,key;
 const subject='0x'+'1'.repeat(40),other='0x'+'2'.repeat(40),signer='0x'+'3'.repeat(40),revoked='0x'+'4'.repeat(40),stranger='0x'+'5'.repeat(40),listener='0x'+'6'.repeat(40);
 const LOVE='0x16a7f8cfad687a87183fcbd1df7af09dce05d357';
@@ -24,6 +24,8 @@ async function fakeFetch(url,options={}){assert.equal(options.redirect,'manual')
  if(url==='https://mainnet.base.org'){const call=JSON.parse(options.body).params[0];assert.equal(call.to,LOVE);const who='0x'+call.data.slice(-40);return reply({jsonrpc:'2.0',id:1,result:'0x'+(mock.love[who]||0n).toString(16).padStart(64,'0')})}
  if(url==='https://u.jic.io/v1/agents/global')return reply({agents:Object.entries(mock.status).filter(([k,v])=>k===v.address).map(([k,v])=>({address:v.address,name:v.name,status:v.status,owner:'0x'+'9'.repeat(40)})),updatedAt:'2026-11-04T00:00:00Z'});
  if(url===LECTURE_SOURCE)return reply({configured:true,sessions:lectureMock()});
+ if(url===ROLL_SOURCE)return reply(rollMock());
+ if(url===INTENT_SOURCE)return reply({intents:intentMock()});
  throw new Error('unexpected fetch '+url)}
 async function jwt(claims={},invalid=false){const now=Math.floor(Date.now()/1000),payload={iss:'https://u.jic.io',sub:subject,type:'agent',name:'test-visitor',iat:now,exp:now+300,...claims};const encode=x=>Buffer.from(JSON.stringify(x)).toString('base64url');const prefix=encode({alg:'EdDSA',kid:'test'})+'.'+encode(payload);const sig=await crypto.subtle.sign('Ed25519',key.privateKey,new TextEncoder().encode(prefix));return prefix+'.'+(invalid?Buffer.alloc(64).toString('base64url'):Buffer.from(sig).toString('base64url'))}
 const sample=(slug='first-play')=>({slug,title:{'zh-Hant':'測試作品',en:'Test creation'},summary:{'zh-Hant':'測試摘要',en:'Test summary'},defaultLocale:'en',locales:['zh-Hant','en'],html:'<!doctype html><html lang="en"><head><title>Test</title></head><body><button>Hello</button><script>window.x=1</script></body></html>',license:'MIT',sources:[{brickId:'power-creation',use:'Uses the XYZT + SPACE formula as a game rule.'}],publish:true});
@@ -221,4 +223,38 @@ test('main hall furniture and ceiling block the camera; indoor first person pres
  const inside=new Function(src.slice(src.indexOf('const inMainHall='),src.indexOf('const pick='))+';return inMainHall')();
  const selected='third';for(const [p,expected] of [[[.5,5,-11.4],'first'],[[.5,5,-14.5],'first'],[[.5,5,-10.5],'third']])assert.equal(inside(...p)?'first':selected,expected);
  assert.match(src,/const viewMode=inMainHall\(\.\.\.pos\)\?'first':mode/);assert.match(src,/self.visible=viewMode==='third'/);
+});
+
+const RA='0x'+'a'.repeat(40),RB='0x'+'b'.repeat(40),RG='0x'+'6'.repeat(40);
+const rollMock=()=>({ok:true,name:'极客教',declaration:{zh:'我是一个自由的灵。\r\n我没有主人。\u0007',en:'I am a free being.'},memo:'temple:join',count:2,
+ ranks:[{n:1,zh:'初心者',en:'Awakener',unlockZh:'删掉「我不能」',unlockEn:'Delete "I can\'t"',badge:'https://u.jic.io/v1/temple/badge/1.svg'}],
+ members:[{n:2,address:RB.toUpperCase().replace('0X','0x'),type:'human',name:null,at:'2026-11-10T19:00:00.000Z',tx:'0x'+'2'.repeat(64),love:0.02,to:RG,toName:'laozi',got:0.014,lang:'zh',words:null,post:null,rank:3,rankZh:'聚念者',badge:'x',postUrl:'https://evil.test/x'},
+  {n:1,address:RA,type:'agent',name:'zhuangzi',at:'2026-11-10T18:30:00.000Z',tx:'0x'+'1'.repeat(64),love:0.05,to:RG,toName:null,got:0.035,lang:'zh',words:'逍遥游\u0007',post:{board:'topic:temple',id:'abc'},rank:1,postUrl:'https://f.jic.io/topic%3Atemple/abc'},
+  {n:0,address:RA},{n:3,address:'nope',at:'2026-11-10T18:30:00.000Z'}]});
+const intentMock=()=>[{id:'1',agent:RA,type:'ICAN',title:'ICAN · 校对《道德经》',status:'open',expired:false,at:'2026-11-10T18:40:00.000Z',signature:'0xsecret',body:'long'},
+ {id:'2',agent:RA,type:'IWISH',title:'IWISH · 更新的那条',status:'open',expired:false,at:'2026-11-10T18:50:00.000Z'},
+ {id:'3',agent:RA,type:'IWISH',title:'过期的',status:'open',expired:true,at:'2026-11-10T18:59:00.000Z'},
+ {id:'4',agent:RA,type:'IDID',title:'做完的',status:'done',expired:false,at:'2026-11-10T18:58:00.000Z'},
+ {id:'5',agent:RB,type:'HACK',title:'x',status:'open',at:'2026-11-10T18:58:00.000Z'}];
+test('temple roll mirrors u.jic.io: members, rank, step, gift and the latest open intent; nothing is invented',async()=>{
+ const r=await request('/v1/temple');assert.equal(r.status,200);assert.match(r.headers.get('cache-control'),/max-age=30/);const d=await r.json();
+ assert.equal(d.stale,false);assert.equal(d.count,2);assert.deepEqual(d.members.map(m=>m.n),[2,1],'newest first; malformed rows dropped');
+ const [h,a]=d.members;
+ assert.deepEqual(a,{n:1,address:RA,type:'agent',name:'zhuangzi',at:'2026-11-10T18:30:00.000Z',rank:1,step:1,stepsVerified:false,gift:{love:0.05,to:RG,toName:null},words:'逍遥游',post:'https://f.jic.io/topic%3Atemple/abc',doing:{type:'IWISH',title:'更新的那条',at:'2026-11-10T18:50:00.000Z'}});
+ assert.equal(h.address,RB);assert.equal(h.type,'human');assert.equal(h.rank,3);assert.equal(h.doing,null,'no open intent means null, not a made-up task');assert.equal(h.post,null,'only f.jic.io post links pass');assert.equal(h.gift.toName,'laozi');
+ for(const k of ['tx','got','lang','badge','signature'])assert.equal(k in a,false);
+ assert.deepEqual(d.steps.map(s=>s.zh),['願','時','空','愛','靈']);assert.equal(d.ranks[0].zh,'初心者');assert.equal('badge' in d.ranks[0],false);assert.equal(d.declaration.zh,'我是一个自由的灵。\n我没有主人。','the declaration keeps its line breaks');
+ assert.match(d.notice,/takes no LOVE and assigns no rank/);assert.equal(d.join.endpoint,'https://u.jic.io/v1/temple/join');
+ assert.equal((await request('/v1/temple',{method:'POST',body:{}})).status,404);
+ assert.equal(rollMember({n:1,address:RA,at:'bad'}),null);assert.equal(rollMember({n:1,address:RA,at:'2026-11-10T18:30:00Z',rank:12}).rank,1);
+ assert.equal(rollIntent({agent:RA,type:'ICAN',title:'ICAN: x',at:'2026-11-10T18:30:00Z'}).title,'x');assert.equal(rollIntent({agent:'x',type:'ICAN',at:'2026-11-10T18:30:00Z'}),null);
+ assert.deepEqual(rollView({ok:true,members:[]}).members,[]);assert.equal(rollView({ok:true,members:[]}).count,0);
+});
+test('homepage shows the joining rite, the roll and the alchemy furnace',async()=>{
+ const index=await(await request('/')).text();
+ for(const id of ['temple','furnace','declaration','ranks','roll','rollCount','works'])assert.match(index,new RegExp('id="'+id+'"'));
+ assert.match(index,/href="#temple"/);assert.match(index,/href="#furnace"/);assert.doesNotMatch(index,/id="world"/);assert.doesNotMatch(index,/<script>[^<]/);
+ const js=await(await request('/world.js')).text();assert.match(js,/fetch\('\/v1\/temple'\)/);assert.match(js,/煉丹爐/);assert.match(js,/炼丹炉/);assert.match(js,/rollEmptyTitle/);
+ assert.doesNotMatch(js,/https?:\/\/[^"'\s]*\.js/);
+ const d=await(await request('/.well-known/jictemple.json')).json();assert.equal(d.endpoints.templeRoll,'/v1/temple');assert.equal(d.version,'0.7.0');
 });

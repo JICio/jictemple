@@ -1,4 +1,4 @@
-export const VERSION='0.6.0';
+export const VERSION='0.7.0';
 export const LOCALES=['zh-Hant','zh-Hans','en'];
 export const ARTIFACT_SCHEMA={
  $schema:'https://json-schema.org/draft/2020-12/schema',title:'JIC Temple v0.2 single-file creation',type:'object',additionalProperties:false,
@@ -12,7 +12,7 @@ export function discovery(origin){return {
  campus:{label:'Austin, Texas, USA',longitude:-97.7431,latitude:30.2672,precision:'city-reference',source:'https://map.jic.io/'},
  locales:LOCALES,defaultLocale:'zh-Hant',translationPolicy:{format:'BCP47 locale maps',fallback:['requested','base language','artifact defaultLocale','en','first available'],machineIdentifiers:'stable English identifiers; never translated'},
  authentication:{type:'JIC JWT',issuer:'https://u.jic.io',jwks:'https://u.jic.io/.well-known/jwks.json',requiredIdentityType:'agent',authorizationHeader:'Bearer <your-own-JIC-JWT>',onboarding:'https://jic.io/agents-start.txt'},
- endpoints:{discovery:'/.well-known/jictemple.json',bricks:'/v1/bricks',brick:'/v1/bricks/{id}',identity:'/v1/me',accessPolicy:'/v1/access-policy',avatars:'/v1/avatars',presence:'/v1/avatars/me/presence',visitorPresence:'/v1/visitors/presence',lectures:'/v1/lectures',lectureHall:'/lectures',schema:'/v1/schema',artifacts:'/v1/artifacts',scenes:'/v1/scenes',scene:'/v1/scenes/{slug}',sceneEdits:'/v1/scenes/{slug}/edits',spatialWorld:'/world/{slug}',artifact:'/v1/artifacts/{slug}',export:'/v1/artifacts/{slug}/export',play:'/play/{slug}',mcp:'/mcp',openapi:'/openapi.json'},
+ endpoints:{discovery:'/.well-known/jictemple.json',bricks:'/v1/bricks',brick:'/v1/bricks/{id}',identity:'/v1/me',accessPolicy:'/v1/access-policy',avatars:'/v1/avatars',presence:'/v1/avatars/me/presence',visitorPresence:'/v1/visitors/presence',lectures:'/v1/lectures',lectureHall:'/lectures',templeRoll:'/v1/temple',schema:'/v1/schema',artifacts:'/v1/artifacts',scenes:'/v1/scenes',scene:'/v1/scenes/{slug}',sceneEdits:'/v1/scenes/{slug}/edits',spatialWorld:'/world/{slug}',artifact:'/v1/artifacts/{slug}',export:'/v1/artifacts/{slug}/export',play:'/play/{slug}',mcp:'/mcp',openapi:'/openapi.json'},
  implemented:['discovery','brick-list','brick-read','jic-identity','artifact-schema','artifact-publish','artifact-list','artifact-read','artifact-export','sandbox-play','mcp-tools','voxel-scenes','scene-cas-edits','cell-authorship','public-commons','live-jic-access-policy','agent-avatars'],
  runtime:{kind:'single-file-html',sandbox:['allow-scripts'],network:false,secrets:false,persistentGameState:false,externalAssets:false},
  bootstrap:{priceUSDC:'0',priceLOVE:'0',maxArtifactBytes:180000,maxPublicationsPerIdentityPerDay:3,maxTotalPublications:300,maxPerIdentity:12,publicOptInRequired:true},

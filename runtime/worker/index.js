@@ -1,6 +1,7 @@
 import {registeredAgent,buildAccess,COMMONS_POLICY} from './access.js';
 import {avatarAPI} from './avatars.js';
 import {lectureAPI} from './lectures.js';
+import {rollAPI} from './roll.js';
 import {sceneAPI} from './scenes.js';
 import {HttpError,boundedJSON,verifyJIC} from './auth.js';
 import {BRICKS} from './bricks.js';
@@ -104,6 +105,7 @@ export default {async fetch(req,env,ctx){
   if(path==='/mcp')return await mcp(req,env);
   if(path.startsWith('/v1/avatars')||path==='/v1/visitors/presence'||/^\/v1\/scenes\/[a-z0-9-]+\/avatars$/.test(path))return await avatarAPI(req,env,path);
   if(path==='/v1/lectures')return await lectureAPI(req,env,path);
+  if(path==='/v1/temple')return await rollAPI(req,env,path);
   if(path.startsWith('/v1/scenes'))return await sceneAPI(req,env,path);
   if(path.startsWith('/v1/'))return await api(req,env,path);
   const content=path.match(/^\/content\/([a-z0-9-]+)$/);
