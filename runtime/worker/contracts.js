@@ -1,4 +1,4 @@
-export const VERSION='0.7.2';
+export const VERSION='0.8.0';
 export const LOCALES=['zh-Hant','zh-Hans','en'];
 export const ARTIFACT_SCHEMA={
  $schema:'https://json-schema.org/draft/2020-12/schema',title:'JIC Temple v0.2 single-file creation',type:'object',additionalProperties:false,

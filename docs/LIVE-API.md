@@ -173,3 +173,13 @@ Austin 基地沿用原地圖的城市參考點。
 - 名冊是空的時候，首頁顯示「名冊還是空的」，不放示例成員。
 - 0.7.2：`step` 改讀 u.jic.io 的進度（`GET https://u.jic.io/v1/temple/<地址>/progress`，第 1 期只核對一轉）。`step` 是成員現在所在的火：它前面的火已完成。`stepsVerified` 為真時才是按證據算的。每位成員多一個 `progress` 連結，由神廟按地址重建。
 - 0.7.1：首頁改用道家叫法（見 [RANKS.md](RANKS.md) v0.3）。九轉各配一卦一力，分三關；五火是起火、火候、出爐、試金、若水。接口欄位名不變：`rank` 是轉（1–9），`step` 是火（1–5）。`steps` 的內容改為五火，`ranks` 多出 `turnZh`、`gua`、`powerZh`、`formula`。
+
+## 0.8 · 名冊帶公示與升轉
+
+- u.jic.io 第 2 期已上線（2026-11-11）：一到三轉的 15 火按公開證據核對，前四火都完成後公示 7 天，期滿在 u.jic.io 登記升轉。規則見 [RANKS.md](RANKS.md) 第十一節。
+- `GET /v1/temple` 每位成員多 2 個欄位：`notice`（`{until, open}` 或 `null`）和 `raises`（已登記的升轉次數）。
+- `notice` 只放行 `until` 是時間、`open` 是布林的值。`raises` 不超過 `rank - 1`。
+- 首頁卡片：公示中顯示「試金公示中，到 <日期>」；公示期滿顯示「公示期滿，可登記升轉」。
+- `stepsVerified` 由 u.jic.io 給出：一到三轉是 `true`，四轉以上是 `false`。
+- 升轉登記、證言、送禮核對都在 u.jic.io。神廟只讀名冊，不保存轉位，不收 LOVE。
+

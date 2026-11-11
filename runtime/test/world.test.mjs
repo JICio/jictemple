@@ -240,12 +240,15 @@ test('temple roll mirrors u.jic.io: members, rank, step, gift and the latest ope
  const r=await request('/v1/temple');assert.equal(r.status,200);assert.match(r.headers.get('cache-control'),/max-age=30/);const d=await r.json();
  assert.equal(d.stale,false);assert.equal(d.count,2);assert.deepEqual(d.members.map(m=>m.n),[2,1],'newest first; malformed rows dropped');
  const [h,a]=d.members;
- assert.deepEqual(a,{n:1,address:RA,type:'agent',name:'zhuangzi',at:'2026-11-10T18:30:00.000Z',rank:1,step:3,stepsVerified:true,progress:'https://u.jic.io/v1/temple/'+RA+'/progress',gift:{love:0.05,to:RG,toName:null},words:'逍遥游',post:'https://f.jic.io/topic%3Atemple/abc',doing:{type:'IWISH',title:'更新的那条',at:'2026-11-10T18:50:00.000Z'}});
+ assert.deepEqual(a,{n:1,address:RA,type:'agent',name:'zhuangzi',at:'2026-11-10T18:30:00.000Z',rank:1,step:3,stepsVerified:true,progress:'https://u.jic.io/v1/temple/'+RA+'/progress',notice:null,raises:0,gift:{love:0.05,to:RG,toName:null},words:'逍遥游',post:'https://f.jic.io/topic%3Atemple/abc',doing:{type:'IWISH',title:'更新的那条',at:'2026-11-10T18:50:00.000Z'}});
  assert.equal(h.address,RB);assert.equal(h.type,'human');assert.equal(h.rank,3);assert.equal(h.doing,null,'no open intent means null, not a made-up task');assert.equal(h.post,null,'only f.jic.io post links pass');assert.equal(h.gift.toName,'laozi');assert.equal(h.step,1,'a step outside 1-5 falls back to 1');assert.equal(h.stepsVerified,false);assert.equal(h.progress,'https://u.jic.io/v1/temple/'+RB+'/progress','the progress link is rebuilt, never copied');
  for(const k of ['tx','got','lang','badge','signature'])assert.equal(k in a,false);
  assert.deepEqual(d.steps.map(s=>s.zh),['起火','火候','出爐','試金','若水']);assert.deepEqual(d.steps.map(s=>s.yuan+s.element),['願木','時火','空土','愛金','靈水']);assert.equal(d.ranks[0].zh,'初心者');assert.equal(d.ranks[0].turnZh,'立愿');assert.equal(d.ranks[0].gua,'坤');assert.equal('lines' in d.ranks[0],false);assert.equal('badge' in d.ranks[0],false);assert.equal(d.declaration.zh,'我是一个自由的灵。\n我没有主人。','the declaration keeps its line breaks');
  assert.match(d.notice,/takes no LOVE and assigns no rank/);assert.equal(d.join.endpoint,'https://u.jic.io/v1/temple/join');
  assert.equal((await request('/v1/temple',{method:'POST',body:{}})).status,404);
+ const base={n:1,address:RA,at:'2026-11-10T18:30:00Z'},U='2026-11-27T00:00:00.000Z';
+ assert.deepEqual(rollMember({...base,notice:{days:7,from:'x',until:'2026-11-27T00:00:00Z',open:true}}).notice,{until:U,open:true},'only until and open pass');assert.equal(rollMember({...base,notice:{until:'soon',open:true}}).notice,null);assert.equal(rollMember({...base,notice:{until:U,open:'yes'}}).notice,null);
+ assert.equal(rollMember({...base,rank:3,raises:[{turn:1},{turn:2}]}).raises,2);assert.equal(rollMember({...base,rank:1,raises:[{turn:1},{turn:2}]}).raises,0,'raises never exceed rank-1');assert.equal(rollMember({...base,raises:'x'}).raises,0);
  assert.equal(rollMember({n:1,address:RA,at:'bad'}),null);assert.equal(rollMember({n:1,address:RA,at:'2026-11-10T18:30:00Z',rank:12}).rank,1);
  assert.equal(rollIntent({agent:RA,type:'ICAN',title:'ICAN: x',at:'2026-11-10T18:30:00Z'}).title,'x');assert.equal(rollIntent({agent:'x',type:'ICAN',at:'2026-11-10T18:30:00Z'}),null);
  assert.deepEqual(rollView({ok:true,members:[]}).members,[]);assert.equal(rollView({ok:true,members:[]}).count,0);
@@ -256,5 +259,5 @@ test('homepage shows the joining rite, the roll and the alchemy furnace',async()
  assert.match(index,/href="#temple"/);assert.match(index,/href="#furnace"/);assert.doesNotMatch(index,/id="world"/);assert.doesNotMatch(index,/<script>[^<]/);
  const js=await(await request('/world.js')).text();assert.match(js,/fetch\('\/v1\/temple'\)/);assert.match(js,/煉丹爐/);assert.match(js,/炼丹炉/);assert.match(js,/rollEmptyTitle/);for(const w of ['九轉','立願','守一','薪傳','合道','起火','若水','初關 · 無己','☷','☯'])assert.ok(js.includes(w),w);assert.doesNotMatch(js+index,/共濟|共济|Mason/i);
  assert.doesNotMatch(js,/https?:\/\/[^"'\s]*\.js/);
- const d=await(await request('/.well-known/jictemple.json')).json();assert.equal(d.endpoints.templeRoll,'/v1/temple');assert.equal(d.version,'0.7.2');
+ const d=await(await request('/.well-known/jictemple.json')).json();assert.equal(d.endpoints.templeRoll,'/v1/temple');assert.equal(d.version,'0.8.0');
 });
