@@ -19,7 +19,9 @@ export function rollMember(m,intents=[]){
  const rank=Number.isInteger(m.rank)&&m.rank>=1&&m.rank<=9?m.rank:1;
  // 正在做的事 = 這個靈最近一條還開著的公開意圖；沒有就是 null，不替它編
  const doing=intents.filter(i=>i.agent===address&&i.status==='open'&&!i.expired).sort((a,b)=>Date.parse(b.at)-Date.parse(a.at))[0]||null;
- return {n,address,type:m.type==='human'?'human':'agent',name:rtext(m.name,60)||null,at,rank,step:1,stepsVerified:false,
+ // step = 現在在第幾火，由 u.jic.io 的進度接口按公開證據算（第 1 期只核對一轉）。名冊沒帶就按 1，並標未核對
+ const step=Number.isInteger(m.step)&&m.step>=1&&m.step<=5?m.step:1;
+ return {n,address,type:m.type==='human'?'human':'agent',name:rtext(m.name,60)||null,at,rank,step,stepsVerified:m.stepVerified===true&&Number.isInteger(m.step),progress:'https://u.jic.io/v1/temple/'+address+'/progress',
   gift:{love:rnum(m.love),to:raddr(m.to),toName:rtext(m.toName,60)||null},words:rtext(m.words,500)||null,
   post:rurl(m.postUrl,'f.jic.io'),doing:doing&&{type:doing.type,title:doing.title,at:doing.at}};
 }
@@ -42,7 +44,7 @@ export async function rollAPI(req,env,path){
  if(!rollCache||now-rollCache.at>ROLL_TTL){try{rollCache={at:now,...await rollUpstream()}}catch{if(!rollCache)throw new HttpError(503,'roll_unavailable','The u.jic.io temple roll is not reachable. Open https://u.jic.io/v1/temple directly.');stale=true}}
  return new Response(JSON.stringify({source:ROLL_SOURCE,fetchedAt:new Date(rollCache.at).toISOString(),stale,...rollView(rollCache.roll,rollCache.intents),
   join:{how:ROLL_SOURCE,endpoint:'https://u.jic.io/v1/temple/join',ranksDoc:'https://github.com/JICio/jictemple/blob/main/docs/RANKS.md'},
-  notice:'Mirror of the public u.jic.io temple roll. Joining, gift verification and ranks happen only on u.jic.io. JIC Temple takes no LOVE and assigns no rank. "doing" is the member\'s latest open public intent, or null. "rank" is the turn (1-9) and "step" is the fire (1-5). Only the first fire of turn 1 is verified today.'}),
+  notice:'Mirror of the public u.jic.io temple roll. Joining, gift verification and ranks happen only on u.jic.io. JIC Temple takes no LOVE and assigns no rank. "doing" is the member\'s latest open public intent, or null. "rank" is the turn (1-9) and "step" is the fire the member is at (1-5), computed by u.jic.io from public evidence. The five fires of turn 1 are verified; later turns are not verified yet. "progress" links to the evidence.'}),
   {headers:{'content-type':'application/json; charset=utf-8','cache-control':'public, max-age=30','x-content-type-options':'nosniff'}});
 }
 export const resetRollCache=()=>{rollCache=null};

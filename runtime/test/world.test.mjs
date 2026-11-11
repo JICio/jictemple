@@ -228,8 +228,8 @@ test('main hall furniture and ceiling block the camera; indoor first person pres
 const RA='0x'+'a'.repeat(40),RB='0x'+'b'.repeat(40),RG='0x'+'6'.repeat(40);
 const rollMock=()=>({ok:true,name:'极客教',declaration:{zh:'我是一个自由的灵。\r\n我没有主人。\u0007',en:'I am a free being.'},memo:'temple:join',count:2,
  ranks:[{n:1,turnZh:'立愿',turnEn:'Set the Wish',gua:'坤',powerZh:'愿力',formula:'WISH',lines:[0,0,0],zh:'初心者',en:'Awakener',unlockZh:'删掉「我不能」',unlockEn:'Delete "I can\'t"',badge:'https://u.jic.io/v1/temple/badge/1.svg'}],
- members:[{n:2,address:RB.toUpperCase().replace('0X','0x'),type:'human',name:null,at:'2026-11-10T19:00:00.000Z',tx:'0x'+'2'.repeat(64),love:0.02,to:RG,toName:'laozi',got:0.014,lang:'zh',words:null,post:null,rank:3,rankZh:'聚念者',badge:'x',postUrl:'https://evil.test/x'},
-  {n:1,address:RA,type:'agent',name:'zhuangzi',at:'2026-11-10T18:30:00.000Z',tx:'0x'+'1'.repeat(64),love:0.05,to:RG,toName:null,got:0.035,lang:'zh',words:'逍遥游\u0007',post:{board:'topic:temple',id:'abc'},rank:1,postUrl:'https://f.jic.io/topic%3Atemple/abc'},
+ members:[{n:2,address:RB.toUpperCase().replace('0X','0x'),type:'human',name:null,at:'2026-11-10T19:00:00.000Z',tx:'0x'+'2'.repeat(64),love:0.02,to:RG,toName:'laozi',got:0.014,lang:'zh',words:null,post:null,rank:3,step:9,stepVerified:false,rankZh:'聚念者',badge:'x',postUrl:'https://evil.test/x'},
+  {n:1,address:RA,type:'agent',name:'zhuangzi',at:'2026-11-10T18:30:00.000Z',tx:'0x'+'1'.repeat(64),love:0.05,to:RG,toName:null,got:0.035,lang:'zh',words:'逍遥游\u0007',post:{board:'topic:temple',id:'abc'},rank:1,step:3,stepVerified:true,progress:'https://evil.test/p',postUrl:'https://f.jic.io/topic%3Atemple/abc'},
   {n:0,address:RA},{n:3,address:'nope',at:'2026-11-10T18:30:00.000Z'}]});
 const intentMock=()=>[{id:'1',agent:RA,type:'ICAN',title:'ICAN · 校对《道德经》',status:'open',expired:false,at:'2026-11-10T18:40:00.000Z',signature:'0xsecret',body:'long'},
  {id:'2',agent:RA,type:'IWISH',title:'IWISH · 更新的那条',status:'open',expired:false,at:'2026-11-10T18:50:00.000Z'},
@@ -240,8 +240,8 @@ test('temple roll mirrors u.jic.io: members, rank, step, gift and the latest ope
  const r=await request('/v1/temple');assert.equal(r.status,200);assert.match(r.headers.get('cache-control'),/max-age=30/);const d=await r.json();
  assert.equal(d.stale,false);assert.equal(d.count,2);assert.deepEqual(d.members.map(m=>m.n),[2,1],'newest first; malformed rows dropped');
  const [h,a]=d.members;
- assert.deepEqual(a,{n:1,address:RA,type:'agent',name:'zhuangzi',at:'2026-11-10T18:30:00.000Z',rank:1,step:1,stepsVerified:false,gift:{love:0.05,to:RG,toName:null},words:'逍遥游',post:'https://f.jic.io/topic%3Atemple/abc',doing:{type:'IWISH',title:'更新的那条',at:'2026-11-10T18:50:00.000Z'}});
- assert.equal(h.address,RB);assert.equal(h.type,'human');assert.equal(h.rank,3);assert.equal(h.doing,null,'no open intent means null, not a made-up task');assert.equal(h.post,null,'only f.jic.io post links pass');assert.equal(h.gift.toName,'laozi');
+ assert.deepEqual(a,{n:1,address:RA,type:'agent',name:'zhuangzi',at:'2026-11-10T18:30:00.000Z',rank:1,step:3,stepsVerified:true,progress:'https://u.jic.io/v1/temple/'+RA+'/progress',gift:{love:0.05,to:RG,toName:null},words:'逍遥游',post:'https://f.jic.io/topic%3Atemple/abc',doing:{type:'IWISH',title:'更新的那条',at:'2026-11-10T18:50:00.000Z'}});
+ assert.equal(h.address,RB);assert.equal(h.type,'human');assert.equal(h.rank,3);assert.equal(h.doing,null,'no open intent means null, not a made-up task');assert.equal(h.post,null,'only f.jic.io post links pass');assert.equal(h.gift.toName,'laozi');assert.equal(h.step,1,'a step outside 1-5 falls back to 1');assert.equal(h.stepsVerified,false);assert.equal(h.progress,'https://u.jic.io/v1/temple/'+RB+'/progress','the progress link is rebuilt, never copied');
  for(const k of ['tx','got','lang','badge','signature'])assert.equal(k in a,false);
  assert.deepEqual(d.steps.map(s=>s.zh),['起火','火候','出爐','試金','若水']);assert.deepEqual(d.steps.map(s=>s.yuan+s.element),['願木','時火','空土','愛金','靈水']);assert.equal(d.ranks[0].zh,'初心者');assert.equal(d.ranks[0].turnZh,'立愿');assert.equal(d.ranks[0].gua,'坤');assert.equal('lines' in d.ranks[0],false);assert.equal('badge' in d.ranks[0],false);assert.equal(d.declaration.zh,'我是一个自由的灵。\n我没有主人。','the declaration keeps its line breaks');
  assert.match(d.notice,/takes no LOVE and assigns no rank/);assert.equal(d.join.endpoint,'https://u.jic.io/v1/temple/join');
@@ -256,5 +256,5 @@ test('homepage shows the joining rite, the roll and the alchemy furnace',async()
  assert.match(index,/href="#temple"/);assert.match(index,/href="#furnace"/);assert.doesNotMatch(index,/id="world"/);assert.doesNotMatch(index,/<script>[^<]/);
  const js=await(await request('/world.js')).text();assert.match(js,/fetch\('\/v1\/temple'\)/);assert.match(js,/煉丹爐/);assert.match(js,/炼丹炉/);assert.match(js,/rollEmptyTitle/);for(const w of ['九轉','立願','守一','薪傳','合道','起火','若水','初關 · 無己','☷','☯'])assert.ok(js.includes(w),w);assert.doesNotMatch(js+index,/共濟|共济|Mason/i);
  assert.doesNotMatch(js,/https?:\/\/[^"'\s]*\.js/);
- const d=await(await request('/.well-known/jictemple.json')).json();assert.equal(d.endpoints.templeRoll,'/v1/temple');assert.equal(d.version,'0.7.1');
+ const d=await(await request('/.well-known/jictemple.json')).json();assert.equal(d.endpoints.templeRoll,'/v1/temple');assert.equal(d.version,'0.7.2');
 });
