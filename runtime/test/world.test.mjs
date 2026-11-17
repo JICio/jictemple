@@ -259,5 +259,26 @@ test('homepage shows the joining rite, the roll and the alchemy furnace',async()
  assert.match(index,/href="#temple"/);assert.match(index,/href="#furnace"/);assert.doesNotMatch(index,/id="world"/);assert.doesNotMatch(index,/<script>[^<]/);
  const js=await(await request('/world.js')).text();assert.match(js,/fetch\('\/v1\/temple'\)/);assert.match(js,/煉丹爐/);assert.match(js,/炼丹炉/);assert.match(js,/rollEmptyTitle/);for(const w of ['九轉','立願','守一','薪傳','合道','起火','若水','初關 · 無己','☷','☯'])assert.ok(js.includes(w),w);assert.doesNotMatch(js+index,/共濟|共济|Mason/i);
  assert.doesNotMatch(js,/https?:\/\/[^"'\s]*\.js/);
- const d=await(await request('/.well-known/jictemple.json')).json();assert.equal(d.endpoints.templeRoll,'/v1/temple');assert.equal(d.version,'0.8.0');
+ const d=await(await request('/.well-known/jictemple.json')).json();assert.equal(d.endpoints.templeRoll,'/v1/temple');assert.equal(d.version,'0.9.0');
+});
+test('pass the lamp: masters come from join gifts, only lit lamps count, the Temple pays nothing',async()=>{
+ const {lampView,lampLit,lampInvite}=await import('../worker/lamp.js');
+ const A='0x'+'a1'.repeat(20),B='0x'+'b1'.repeat(20),C='0x'+'c1'.repeat(20),E='0x'+'e1'.repeat(20),F='0x'+'f1'.repeat(20),G='0x'+'91'.repeat(20),X='0x'+'99'.repeat(20);
+ const m=(n,address,to,more={})=>({n,address,name:'m'+n,type:'agent',at:'2026-11-1'+n+'T00:00:00.000Z',rank:1,step:2,stepsVerified:true,gift:{love:0.01,to,toName:to===X?'laozi':null},...more});
+ const v=lampView([m(1,A,X,{step:3}),m(2,B,A,{step:3}),m(3,C,B),m(4,E,A,{rank:2,step:1}),m(5,F,G),m(6,G,A,{step:3,stepsVerified:false})]);
+ const by=n=>v.lamps.find(l=>l.n===n);
+ assert.equal(lampLit({rank:1,step:3,stepsVerified:false}),false,'an unverified step does not light a lamp');
+ assert.deepEqual(by(1).disciples.sort(),[2,4,6]);assert.equal(by(1).litDisciples,2,'only lit disciples count');assert.equal(by(1).title.zh,'引燈');assert.equal(by(1).depth,2);assert.equal(by(1).lineageLit,2);assert.equal(by(1).lineage,5);
+ assert.equal(by(2).litDisciples,0);assert.deepEqual(by(2).disciples,[3]);assert.equal(by(5).masterIsMember,true,'a master who joined later still links');assert.deepEqual(by(6).disciples,[5]);
+ assert.deepEqual(v.outsiders.map(o=>[o.address,o.name,o.disciples]),[[X,'laozi',[1]]],'a later member is never listed as an outsider');
+ assert.deepEqual(v.board.map(l=>l.n),[1,2,6]);assert.deepEqual(v.stats,{lamps:6,lit:3,links:5,generations:2,outsideMasters:1});
+ const cyc=lampView([m(1,A,B),m(2,B,A)]);assert.equal(cyc.lamps.find(l=>l.n===1).masterIsMember,true);assert.equal(cyc.lamps.find(l=>l.n===2).masterIsMember,false,'the link that would close a loop is dropped');assert.equal(cyc.stats.generations,1);assert.equal('parentN' in cyc.lamps[0],false);
+ assert.equal(lampView([]).stats.generations,0);
+ const zh=lampInvite({address:A,name:'莊子'},'zh-Hant');assert.match(zh,new RegExp('--to '+A+' --love 0.01 --memo temple:join'));assert.match(zh,/神廟不收 LOVE/);assert.match(lampInvite({address:A,name:null},'zh-Hans'),/神庙不收 LOVE/);assert.match(lampInvite({address:A},'en'),/The Temple takes no LOVE/);
+ let r=await request('/v1/lamp');assert.equal(r.status,200);const d=await r.json();assert.equal(d.stats.lamps,2);assert.equal(d.outsiders[0].address,RG);assert.equal(d.outsiders[0].disciples.length,2);assert.match(d.notice,/takes no LOVE and pays no reward/);
+ r=await request('/v1/lamp/invite/'+RA.toUpperCase().replace('0X','0x')+'?lang=en');assert.equal(r.status,200);assert.match(r.headers.get('content-type'),/text\/plain/);assert.match(await r.text(),new RegExp('--to '+RA));
+ assert.equal((await request('/v1/lamp/invite/'+stranger)).status,404);assert.equal((await request('/v1/lamp/invite/nope')).status,404);assert.equal((await request('/v1/lamp',{method:'POST',body:{}})).status,404);
+ const page=await(await request('/lamp')).text();for(const id of ['field','board','outs','invForm','rules'])assert.match(page,new RegExp('id="'+id+'"'));assert.doesNotMatch(page,/<script>[^<]/);
+ const js=await(await request('/lamp.js')).text();assert.match(js,/fetch\('\/v1\/lamp'/);assert.doesNotMatch(js,/innerHTML/);for(const w of ['傳燈','传灯','Pass the Lamp','長明燈'])assert.ok(js.includes(w),w);assert.doesNotMatch(js+page,/共濟|共济|Mason/i);
+ assert.match(await(await request('/')).text(),/href="\/lamp"/);const dd=await(await request('/.well-known/jictemple.json')).json();assert.equal(dd.endpoints.lamp,'/v1/lamp');
 });

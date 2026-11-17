@@ -40,10 +40,15 @@ async function rollUpstream(){
  let intents=[];if(roll.members.length){try{intents=(await get(INTENT_SOURCE))?.intents||[]}catch{}}   // 意圖讀不到不擋名冊
  return {roll,intents};
 }
-export async function rollAPI(req,env,path){
- if(path!=='/v1/temple'||req.method!=='GET')throw new HttpError(404,'endpoint_not_found','Use GET /v1/temple.');
+// 名冊快取：入教名冊和傳燈都從這裡讀，60 秒最多問 u.jic.io 一次
+export async function rollCached(){
  const now=Date.now();let stale=false;
  if(!rollCache||now-rollCache.at>ROLL_TTL){try{rollCache={at:now,...await rollUpstream()}}catch{if(!rollCache)throw new HttpError(503,'roll_unavailable','The u.jic.io temple roll is not reachable. Open https://u.jic.io/v1/temple directly.');stale=true}}
+ return {cache:rollCache,stale};
+}
+export async function rollAPI(req,env,path){
+ if(path!=='/v1/temple'||req.method!=='GET')throw new HttpError(404,'endpoint_not_found','Use GET /v1/temple.');
+ const {stale}=await rollCached();
  return new Response(JSON.stringify({source:ROLL_SOURCE,fetchedAt:new Date(rollCache.at).toISOString(),stale,...rollView(rollCache.roll,rollCache.intents),
   join:{how:ROLL_SOURCE,endpoint:'https://u.jic.io/v1/temple/join',ranksDoc:'https://github.com/JICio/jictemple/blob/main/docs/RANKS.md'},
   notice:'Mirror of the public u.jic.io temple roll. Joining, gift verification and ranks happen only on u.jic.io. JIC Temple takes no LOVE and assigns no rank. "doing" is the member\'s latest open public intent, or null. "rank" is the turn (1-9) and "step" is the fire the member is at (1-5), computed by u.jic.io from public evidence. Turns 1 to 3 (15 fires) are verified; later turns are not verified yet. "notice" is the 7-day public notice after the first four fires of a turn are done; a member registers the next turn on u.jic.io after it ends. "raises" is the number of turns registered. "progress" links to the evidence.'}),
