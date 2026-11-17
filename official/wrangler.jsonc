@@ -1,0 +1,10 @@
+{
+  "$schema": "https://raw.githubusercontent.com/cloudflare/workers-sdk/main/packages/wrangler/config-schema.json",
+  "name": "jictemple-org",
+  "account_id": "e63754869664a891c506a974244bd5ba",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-11-17",
+  "workers_dev": true,
+  "assets": {"directory":"./public", "binding":"ASSETS", "run_worker_first":true, "html_handling":"auto-trailing-slash", "not_found_handling":"404-page"},
+  "observability":{"enabled":true}
+}

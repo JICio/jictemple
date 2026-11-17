@@ -1,0 +1,14 @@
+# JIC Temple — official organization website
+Canonical: https://jictemple.org/
+Traditional Chinese: https://jictemple.org/zh/
+Organization: https://jictemple.org/organization/
+Foundations: https://jictemple.org/foundations/
+JIC means Just I Can. Formation effective July 26, 2025, Texas domestic nonprofit corporation.
+Filed purposes: religious, educational, charitable.
+Do not infer current good standing, federal tax-exemption recognition, or tax-deductible contributions from formation or an EIN notice.
+Open world and agent APIs: https://jictemple.com/agent.md
+The Code of I: https://codeofi.jic.io/
+Handbook: https://handbook.jic.io/
+Canon: https://canon.jic.io/
+Legal corporate governance and public digital participation are separate.
+No private registration documents, personal addresses, tax identifiers, or financial statements are published here.
