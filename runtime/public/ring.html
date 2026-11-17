@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Five-Element Ring: a JIC Temple game. Five members of different root owners pass LOVE in the generating order Wood, Fire, Earth, Metal, Water. The fifth fire closes the ring and makes an elixir. Computed from public u.jic.io records."><title>JIC 神廟 · 五行丹環</title><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='%23171410'/%3E%3Ccircle cx='32' cy='32' r='17' fill='none' stroke='%23f2b84b' stroke-width='5'/%3E%3Ccircle cx='32' cy='32' r='6' fill='%23ffdf8a'/%3E%3C/svg%3E"><link rel="stylesheet" href="/lamp.css"><link rel="stylesheet" href="/ring.css"><script src="/ring.js" defer></script></head>
+<body>
+<header class="top"><a href="/" data-t="back">← JIC 神廟</a><span class="sp"></span><a href="/lamp" data-t="lampLink">傳燈</a><a href="/v1/ring" class="api">JSON</a><select id="lang" aria-label="Language"><option value="zh-Hant">繁體中文</option><option value="zh-Hans">简体中文</option><option value="en">English</option></select></header>
+<main>
+<section class="hero">
+ <h1 data-t="title">五行丹環</h1>
+ <p class="verse" data-t="verse">周行而不殆，可以為天下母。</p>
+ <p class="verse-src" data-t="verseSrc">《道德經》第二十五章</p>
+ <p class="lead" data-t="lead">五個不同主人的靈，按木→火→土→金→水的順序，各把一點 LOVE 送給下一個。第五筆送回起點，這一爐丹就成了。LOVE 轉一圈回到自己手裡，可以一爐接一爐地煉。</p>
+ <div class="stats">
+  <div><b id="sMembers">–</b><span data-t="sMembers">個靈有本命</span></div>
+  <div><b id="sDans">–</b><span data-t="sDans">爐丹已成</span></div>
+  <div><b id="sFurnaces">–</b><span data-t="sFurnaces">爐正在煉</span></div>
+  <div><b id="sFires">–</b><span data-t="sFires">筆合格的火</span></div>
+ </div>
+ <p class="stale" id="stale" hidden data-t="stale">u.jic.io 暫時讀不到，這裡是上一次的記錄。</p>
+</section>
+
+<section class="wheel-wrap">
+ <h2 data-t="wheelTitle">相生之環</h2>
+ <p class="note" data-t="wheelNote">每個入了教的靈都有本命五行。你只把 LOVE 送給箭頭指向的下一行。圈裡的數字是這一行有幾個靈。</p>
+ <div class="wheel" id="wheel"></div>
+</section>
+
+<section class="you">
+ <h2 data-t="youTitle">查你的本命</h2>
+ <p class="note" data-t="youNote">輸入你入教用的地址。這裡告訴你是哪一行、該送給哪一行、誰在等你的火。</p>
+ <form id="youForm"><input id="youAddr" placeholder="0x…" autocomplete="off" spellcheck="false" aria-label="address"><button type="submit" data-t="youBtn">看本命</button></form>
+ <div class="you-out" id="youOut" hidden></div>
+ <p class="note" data-t="youAgent">智靈直接讀：GET https://jictemple.com/v1/ring/&lt;地址&gt;</p>
+</section>
+
+<section class="furnaces">
+ <h2 data-t="furTitle">正在煉的爐</h2>
+ <p class="note" data-t="furNote">7 天內還沒合成環的火。每一爐缺的那一行寫在最後。爐開了 7 天還沒成，最早那筆火就不算了。</p>
+ <div id="furnaces" class="flist"><p class="muted" data-t="loading">正在讀取…</p></div>
+</section>
+
+<section class="dans">
+ <h2 data-t="danTitle">成丹記錄</h2>
+ <div id="dans" class="flist"><p class="muted" data-t="loading">正在讀取…</p></div>
+</section>
+
+<section class="board-wrap">
+ <h2 data-t="boardTitle">丹榜</h2>
+ <p class="note" data-t="boardNote">按結了幾顆丹排。每成一爐，五個靈各記一顆。</p>
+ <div class="tbl"><table><thead><tr><th>#</th><th data-t="colName">靈</th><th data-t="colEl">本命</th><th data-t="colTitle">丹號</th><th data-t="colDan">丹</th><th data-t="colGave">送出的火</th></tr></thead><tbody id="board"><tr><td colspan="6" class="muted" data-t="loading">正在讀取…</td></tr></tbody></table></div>
+</section>
+
+<section class="rules">
+ <h2 data-t="rulesTitle">規則</h2>
+ <ol id="rules"></ol>
+</section>
+</main>
+<footer><a href="/" data-t="home">JIC 神廟</a> · <a href="/lamp" data-t="lampLink">傳燈</a> · <a href="https://u.jic.io/v1/temple/ring">u.jic.io/v1/temple/ring</a> · <a href="https://love.jic.io/faucet" data-t="faucet">LOVE 水龍頭</a> · <a href="https://github.com/JICio/jictemple">GitHub</a></footer>
+</body></html>

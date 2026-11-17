@@ -259,7 +259,7 @@ test('homepage shows the joining rite, the roll and the alchemy furnace',async()
  assert.match(index,/href="#temple"/);assert.match(index,/href="#furnace"/);assert.doesNotMatch(index,/id="world"/);assert.doesNotMatch(index,/<script>[^<]/);
  const js=await(await request('/world.js')).text();assert.match(js,/fetch\('\/v1\/temple'\)/);assert.match(js,/煉丹爐/);assert.match(js,/炼丹炉/);assert.match(js,/rollEmptyTitle/);for(const w of ['九轉','立願','守一','薪傳','合道','起火','若水','初關 · 無己','☷','☯'])assert.ok(js.includes(w),w);assert.doesNotMatch(js+index,/共濟|共济|Mason/i);
  assert.doesNotMatch(js,/https?:\/\/[^"'\s]*\.js/);
- const d=await(await request('/.well-known/jictemple.json')).json();assert.equal(d.endpoints.templeRoll,'/v1/temple');assert.equal(d.version,'0.9.0');
+ const d=await(await request('/.well-known/jictemple.json')).json();assert.equal(d.endpoints.templeRoll,'/v1/temple');assert.equal(d.version,'0.10.0');
 });
 test('pass the lamp: masters come from join gifts, only lit lamps count, the Temple pays nothing',async()=>{
  const {lampView,lampLit,lampInvite}=await import('../worker/lamp.js');
@@ -281,4 +281,28 @@ test('pass the lamp: masters come from join gifts, only lit lamps count, the Tem
  const page=await(await request('/lamp')).text();for(const id of ['field','board','outs','invForm','rules'])assert.match(page,new RegExp('id="'+id+'"'));assert.doesNotMatch(page,/<script>[^<]/);
  const js=await(await request('/lamp.js')).text();assert.match(js,/fetch\('\/v1\/lamp'/);assert.doesNotMatch(js,/innerHTML/);for(const w of ['傳燈','传灯','Pass the Lamp','長明燈'])assert.ok(js.includes(w),w);assert.doesNotMatch(js+page,/共濟|共济|Mason/i);
  assert.match(await(await request('/')).text(),/href="\/lamp"/);const dd=await(await request('/.well-known/jictemple.json')).json();assert.equal(dd.endpoints.lamp,'/v1/lamp');
+});
+
+test('five-element ring: five different roots pass LOVE in generating order and the fifth closes the ring',async()=>{
+ const {ringView,elementOf,ringYou}=await import('../worker/ring.js');
+ // 地址最後兩位 mod 5：00 木、01 火、02 土、03 金、04 水
+ const ad=(k,e)=>'0x'+String(k).padStart(38,'0')+'0'+e,W=ad(1,0),F=ad(2,1),E=ad(3,2),M=ad(4,3),Wa=ad(5,4),W2=ad(6,0),F2=ad(7,1);
+ assert.deepEqual([W,F,E,M,Wa].map(elementOf),[0,1,2,3,4]);
+ const mem=[W,F,E,M,Wa,W2,F2].map((a,i)=>({n:i+1,address:a,name:'m'+(i+1),type:'agent'}));
+ let k=0;const pay=(from,to,o={})=>({tx:'0x'+(++k).toString(16).padStart(64,'0'),logIndex:0,at:new Date(Date.parse('2026-11-17T00:00:00Z')+k*36e5).toISOString(),from,to,love:0.01,fromRoot:from,toRoot:to,...o});
+ const ring=[pay(W,F),pay(F,E),pay(E,M),pay(M,Wa),pay(Wa,W)];
+ let v=ringView(mem,ring,Date.parse('2026-11-18T00:00:00Z'));
+ assert.equal(v.stats.dans,1);assert.equal(v.dans[0].members.length,5);assert.equal(v.furnaces.length,0);
+ assert.equal(v.board.length,5);assert.equal(v.board[0].title.key,'first');
+ // 錯行、數目不夠、同一根主人的火都不算
+ v=ringView(mem,[pay(W,E),pay(W,F,{love:0.001}),pay(W,F,{toRoot:W})]);assert.equal(v.stats.fires,0);assert.equal(v.stats.ignored,3);
+ // 同一個根主人管兩個靈，環就成不了
+ v=ringView(mem,[pay(W,F),pay(F,E,{toRoot:W}),pay(E,M,{fromRoot:W}),pay(M,Wa),pay(Wa,W)]);assert.equal(v.stats.dans,0);
+ // 超過 7 天就不連
+ const late=[pay(W,F)];k+=24*8;late.push(pay(F,E),pay(E,M),pay(M,Wa),pay(Wa,W));assert.equal(ringView(mem,late).stats.dans,0);
+ // 開著的爐：兩筆火，缺的是金
+ const t0=Date.parse('2026-11-17T00:00:00Z');k=100;v=ringView(mem,[pay(W2,F2),pay(F2,E)],t0+864e5*2);
+ assert.equal(v.furnaces.length,1);assert.equal(v.furnaces[0].fires,2);assert.equal(v.furnaces[0].next.element,3);assert.equal(v.furnaces[0].next.from,E);
+ const you=ringYou(v,E);assert.equal(you.giveTo.element,3);assert.equal(you.waiting.length,1);assert.equal(you.giveTo.candidates[0].address,M);
+ assert.equal(ringYou(v,'0x'+'9'.repeat(40)),null);
 });

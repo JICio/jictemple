@@ -1,0 +1,32 @@
+:root{--wood:#6fbf73;--fire:#e0603c;--earth:#c9a45a;--metal:#e6e1d3;--water:#4f8fd6}
+.top a+a{margin-left:4px}
+.hero{margin-top:48px}
+.wheel{background:radial-gradient(ellipse at 50% 45%,#221a10 0,#0d0b09 70%);border:1px solid var(--line);border-radius:14px;padding:8px 0}
+.wheel svg{display:block;margin:0 auto;width:100%;max-width:480px;height:auto}
+.wheel .arc{fill:none;stroke:#f2b84b55;stroke-width:2.2;stroke-dasharray:6 9;animation:flow 2.2s linear infinite}
+.wheel .arc.hot{stroke:var(--gold2);stroke-width:3.2}
+@keyframes flow{to{stroke-dashoffset:-30}}
+@media (prefers-reduced-motion:reduce){.wheel .arc{animation:none}}
+.wheel .node circle.core{stroke:#0d0b09;stroke-width:3}.wheel .node.me circle.core{stroke:#fff;stroke-width:3}
+.wheel .node text{text-anchor:middle;font-family:"Noto Serif TC","Songti TC",serif}
+.wheel .node text.el{font-size:30px;font-weight:700;fill:#120f0c}
+.wheel .node text.cnt{font:600 13px system-ui,sans-serif;fill:var(--ink)}
+.wheel .node text.en{font:11px system-ui,sans-serif;fill:var(--muted)}
+.wheel .center text{text-anchor:middle}.wheel .center .big{font:700 40px system-ui,sans-serif;fill:var(--gold2)}.wheel .center .sm{font:13px system-ui,"PingFang TC",sans-serif;fill:var(--muted)}
+.wheel .dan{fill:url(#danGlow)}
+.you form{display:flex;gap:8px;flex-wrap:wrap}.you input{flex:1 1 280px;min-width:0;background:var(--bg2);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:10px 12px;font:14px ui-monospace,Menlo,monospace}
+.you button{background:var(--gold);color:#1a130a;border:0;border-radius:8px;padding:10px 18px;font-weight:700;cursor:pointer;font-family:system-ui,"PingFang TC",sans-serif}
+.you-out{margin-top:12px;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:14px 16px;font:14px/1.8 system-ui,"PingFang TC",sans-serif}
+.you-out .big{font-size:18px}.you-out code{display:block;white-space:pre-wrap;word-break:break-all;background:#0b0907;border:1px solid var(--line);border-radius:8px;padding:10px;margin:6px 0;font:12.5px/1.6 ui-monospace,Menlo,monospace;color:#e6dcc5}
+.you-out .cands{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 8px}
+.flist{display:grid;gap:10px}
+.fur{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.fur .chain{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.fur .meta{margin-top:6px;color:var(--muted);font:12.5px system-ui,"PingFang TC",sans-serif}
+.chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 10px 3px 4px;background:#0d0b09;border:1px solid var(--line);font:13px system-ui,"PingFang TC",sans-serif;max-width:15em;min-width:0}
+.chip .e{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;color:#120f0c;font:700 13px "Noto Serif TC","Songti TC",serif;flex:none}
+.chip .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chip.need{border-style:dashed;border-color:var(--gold);color:var(--gold2)}
+.arrow{color:var(--gold);font:13px system-ui}
+.e0{background:var(--wood)}.e1{background:var(--fire)}.e2{background:var(--earth)}.e3{background:var(--metal)}.e4{background:var(--water)}
+td .chip{padding:1px 8px 1px 2px}td .chip .e{width:18px;height:18px;font-size:11px}
