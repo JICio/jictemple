@@ -1,0 +1,98 @@
+{
+  "revision": 2,
+  "blocks1": 463,
+  "blocks2": 463,
+  "identicalBlocks": true,
+  "steps1": 32,
+  "steps2": 32,
+  "identicalRoute": true,
+  "identicalLamps": true,
+  "spawnUnchanged": true,
+  "landmarkPositionsUnchanged": true,
+  "english": {
+    "title": true,
+    "summary": true,
+    "landmarks": [
+      {
+        "index": 0,
+        "title": true,
+        "body": true
+      },
+      {
+        "index": 1,
+        "title": true,
+        "body": true
+      },
+      {
+        "index": 2,
+        "title": true,
+        "body": true
+      },
+      {
+        "index": 3,
+        "title": true,
+        "body": true
+      },
+      {
+        "index": 4,
+        "title": true,
+        "body": true
+      },
+      {
+        "index": 5,
+        "title": true,
+        "body": true
+      }
+    ]
+  },
+  "snapshotChecks": [
+    {
+      "position": [
+        1,
+        0,
+        11
+      ],
+      "material": "WISH"
+    },
+    {
+      "position": [
+        1,
+        1,
+        11
+      ],
+      "material": null
+    },
+    {
+      "position": [
+        0,
+        1,
+        0
+      ],
+      "material": "SPACE"
+    },
+    {
+      "position": [
+        3,
+        0,
+        5
+      ],
+      "material": "TIME"
+    },
+    {
+      "position": [
+        3,
+        0,
+        1
+      ],
+      "material": "XYZT"
+    },
+    {
+      "position": [
+        7,
+        0,
+        5
+      ],
+      "material": "WISH"
+    }
+  ]
+}

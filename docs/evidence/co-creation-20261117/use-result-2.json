@@ -1,0 +1,273 @@
+{
+  "kind": "API-grid-simulation; no browser walking claimed",
+  "revision": 2,
+  "etag": null,
+  "canonicalEtag": "\"scene-2\"",
+  "rules": {
+    "zh-Hant": "目標：從木燈走到金燈。只沿通道移動，每步沿 x 或 z 軸走一格。不可拆牆、爬牆或跳過牆。回報最短步數、三座途中燈的順序，以及可重走的轉彎座標。起點為 (1,11)，終點為 (11,1)。座標均按 (x,z) 記錄。",
+    "en": "Goal: walk from the Wood Lamp to the Metal Lamp. Follow the corridors. Each step moves one cell along the x or z axis. Do not remove walls, climb walls, or jump over walls. Report the shortest step count, the order of the three lamps on the route, and turn coordinates that let another visitor repeat the route. Start at (1,11). Finish at (11,1). Record all coordinates as (x,z)."
+  },
+  "spawn": [
+    1.5,
+    2.65,
+    11.5
+  ],
+  "steps": 32,
+  "path": [
+    [
+      1,
+      11
+    ],
+    [
+      1,
+      10
+    ],
+    [
+      1,
+      9
+    ],
+    [
+      1,
+      8
+    ],
+    [
+      1,
+      7
+    ],
+    [
+      2,
+      7
+    ],
+    [
+      3,
+      7
+    ],
+    [
+      3,
+      6
+    ],
+    [
+      3,
+      5
+    ],
+    [
+      2,
+      5
+    ],
+    [
+      1,
+      5
+    ],
+    [
+      1,
+      4
+    ],
+    [
+      1,
+      3
+    ],
+    [
+      1,
+      2
+    ],
+    [
+      1,
+      1
+    ],
+    [
+      2,
+      1
+    ],
+    [
+      3,
+      1
+    ],
+    [
+      4,
+      1
+    ],
+    [
+      5,
+      1
+    ],
+    [
+      6,
+      1
+    ],
+    [
+      7,
+      1
+    ],
+    [
+      7,
+      2
+    ],
+    [
+      7,
+      3
+    ],
+    [
+      7,
+      4
+    ],
+    [
+      7,
+      5
+    ],
+    [
+      8,
+      5
+    ],
+    [
+      9,
+      5
+    ],
+    [
+      9,
+      4
+    ],
+    [
+      9,
+      3
+    ],
+    [
+      9,
+      2
+    ],
+    [
+      9,
+      1
+    ],
+    [
+      10,
+      1
+    ],
+    [
+      11,
+      1
+    ]
+  ],
+  "turns": [
+    [
+      1,
+      11
+    ],
+    [
+      1,
+      7
+    ],
+    [
+      3,
+      7
+    ],
+    [
+      3,
+      5
+    ],
+    [
+      1,
+      5
+    ],
+    [
+      1,
+      1
+    ],
+    [
+      7,
+      1
+    ],
+    [
+      7,
+      5
+    ],
+    [
+      9,
+      5
+    ],
+    [
+      9,
+      1
+    ],
+    [
+      11,
+      1
+    ]
+  ],
+  "orderedLamps": [
+    {
+      "name": "火燈",
+      "position": [
+        3,
+        5
+      ],
+      "step": 8
+    },
+    {
+      "name": "水燈",
+      "position": [
+        3,
+        1
+      ],
+      "step": 16
+    },
+    {
+      "name": "木燈",
+      "position": [
+        7,
+        5
+      ],
+      "step": 24
+    }
+  ],
+  "observations": [
+    {
+      "position": [
+        1,
+        0,
+        11
+      ],
+      "material": "WISH"
+    },
+    {
+      "position": [
+        1,
+        1,
+        11
+      ],
+      "material": null
+    },
+    {
+      "position": [
+        0,
+        1,
+        0
+      ],
+      "material": "SPACE"
+    },
+    {
+      "position": [
+        3,
+        0,
+        5
+      ],
+      "material": "TIME"
+    },
+    {
+      "position": [
+        3,
+        0,
+        1
+      ],
+      "material": "XYZT"
+    },
+    {
+      "position": [
+        7,
+        0,
+        5
+      ],
+      "material": "WISH"
+    }
+  ],
+  "map": "#############\n#*******#**E#\n#*#####*#*#.#\n#*#...#*#*#.#\n#*###.#*#*#.#\n#***#.#***#.#\n###*#.#####.#\n#***#.....#.#\n#*###.###.#.#\n#*#...#...#.#\n#*#.#.#####.#\n#S#.#.......#\n#############"
+}

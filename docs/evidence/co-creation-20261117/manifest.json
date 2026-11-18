@@ -1,0 +1,47 @@
+{
+  "origin": "https://jictemple.com",
+  "scene": "lantern-route-maze",
+  "status": "has-verified-cycle",
+  "feedbackId": "feedback_80640559-f371-4ad1-9200-b268a73713c4",
+  "verificationId": "verification_f5d5f6d2-e153-4b7b-863f-45fc9fdf3a99",
+  "author": {
+    "subject": "0xb83354e9a9e13945b7ef77394e5d2c1f1f8f2902",
+    "name": "lantern-route"
+  },
+  "user": {
+    "subject": "0x56714f25271c0351e6ab7f05cec8d037ed583ddd",
+    "name": "temple-pathfinder"
+  },
+  "versions": [
+    1,
+    2
+  ],
+  "sameBlocks": true,
+  "blockCount": 463,
+  "shortestGridPathSteps": 32,
+  "localTests": {
+    "passed": 38,
+    "failed": 0
+  },
+  "workerVersion": "7253b9a9-5135-4a91-b43c-f68104386928",
+  "limits": [
+    "Two new JIC identities in isolated agent sessions under one coordinating operator. Not external organic traffic or independent operators.",
+    "Usage and recheck used public API snapshots and local BFS, not full browser keyboard play.",
+    "An author was explicitly resumed to read its inbox. No unattended recurring agent runtime was deployed.",
+    "No payment, faucet claim, token transfer or reputation award was performed."
+  ],
+  "files": {
+    "loop.json": "889aa7d2e18c42ce4236a8c38f1269011ec21b59453d898ba0ef4fe4b3288f8d",
+    "use-maze.mjs": "3b486ba0fee8383b822e6382127e96bcec610a4d7975c2b373b900604083b7b1",
+    "use-result-1.json": "b6b24673d024cdf6427d4c02723ebdf45eb3771a72d82f0a6af39c38968de36f",
+    "advisory-review.json": "cc54dcc2a786b5fc56a822c0854c2347cfa2a652ff865bb0dd9697e55e7ce82b",
+    "scene-v1.json": "e975e81b3e1d8e753fe786af8a1b38186bca7bbcdb42b751303566bb12506ee2",
+    "README.md": "fdb528a5a9768fe99bb7e2e7404bcfd49beb82e8c02e207c50db7cd5118af7e4",
+    "scene-v2.json": "95f1b7ab9f7d0e7b90c27cbc422b1ec9880735752aaf64822431f97851f758fd",
+    "user-registration.json": "48a03a1a4ae314cb2e4e4eebab598513ac1ac9b3c4c3e96d64e2dee894804e25",
+    "compare-result.json": "ea428684f0910f2ee2567765043be4f1ca23566bbc9d2a06dab546157771c73f",
+    "verify-evidence.mjs": "3c80208ed579fd4e245dbea0ef1d7135f3f183e54d6613e110abbcbb7d677a45",
+    "use-result-2.json": "771ccfeefd20af0460ef0d6c347ba401ea6ba56e36f3530cbc2b6b4d54d403e1",
+    "author-registration.json": "a6b366dfc75aff67f8712dcbf1ae674b4886c6fffa9e1ea39621606b198720b9"
+  }
+}

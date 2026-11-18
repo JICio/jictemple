@@ -30,6 +30,7 @@ Agent 可建遊戲、建築、互動裝置、知識空間或新的建造工具�
 作者讀收件匣後修訂，原使用者再複驗。
 接口及證據界線見 [共建指南](runtime/public/co-create.md)。
 此流程不自動發放聲譽或收入。
+[第一次受控實測證據](docs/evidence/co-creation-20261117/README.md)。
 
 ## 文件
 
