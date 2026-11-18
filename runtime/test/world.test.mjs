@@ -42,7 +42,7 @@ test('another identity cannot replace a slug',async()=>{const r=await request('/
 test('HTML is delivered with opaque sandbox and no network or core access',async()=>{const r=await request('/content/first-play');const csp=r.headers.get('content-security-policy');assert.match(csp,/sandbox allow-scripts/);assert.doesNotMatch(csp,/allow-same-origin/);assert.match(csp,/connect-src 'none'/);assert.match(csp,/form-action 'none'/);assert.match(csp,/frame-src 'none'/);assert.equal(await r.text(),sample().html);const page=await(await request('/play/first-play')).text();assert.match(page,/sandbox="allow-scripts"/);assert.doesNotMatch(page,/allow-same-origin/)});
 test('UTF-8 byte limit rejects a multibyte file below the character limit',async()=>{const r=await request('/v1/artifacts',{method:'POST',token:await jwt(),body:{...sample('oversized'),html:sample().html+'愛'.repeat(61000)},key:'oversize-001'});assert.equal(r.status,400)});
 test('per-day quota is enforced, even for parallel create attempts',async()=>{const token=await jwt();const results=await Promise.all(['second','third','fourth','fifth'].map((s,i)=>request('/v1/artifacts',{method:'POST',token,body:sample('play-'+s),key:'quota-key-'+i})));assert.equal(results.filter(r=>r.status===201).length,2);assert.equal(results.filter(r=>r.status===429).length,2)});
-test('MCP exposes the same read and identity boundary',async()=>{let r=await request('/mcp',{method:'POST',body:{jsonrpc:'2.0',id:1,method:'tools/list'}});const d=await r.json();assert.equal(d.result.tools.length,9);r=await request('/mcp',{method:'POST',body:{jsonrpc:'2.0',id:2,method:'tools/call',params:{name:'temple_me',arguments:{}}}});assert.equal((await r.json()).result.isError,true);r=await request('/mcp',{method:'POST',body:{jsonrpc:'2.0',id:3,method:'tools/call',params:{name:'temple_export',arguments:{slug:'../../secret'}}}});assert.equal((await r.json()).result.isError,true)});
+test('MCP exposes the same read and identity boundary',async()=>{let r=await request('/mcp',{method:'POST',body:{jsonrpc:'2.0',id:1,method:'tools/list'}});const d=await r.json();assert.equal(d.result.tools.length,14);r=await request('/mcp',{method:'POST',body:{jsonrpc:'2.0',id:2,method:'tools/call',params:{name:'temple_me',arguments:{}}}});assert.equal((await r.json()).result.isError,true);r=await request('/mcp',{method:'POST',body:{jsonrpc:'2.0',id:3,method:'tools/call',params:{name:'temple_export',arguments:{slug:'../../secret'}}}});assert.equal((await r.json()).result.isError,true)});
 
 
 const sceneBody=(slug,patch={})=>({slug,title:{en:'Commons'},summary:{en:'A shared virtual scene.'},publish:true,dataLicense:'CC0-1.0',spawn:[0,2,5],sources:['element-love'],blocks:[{x:0,y:0,z:0,material:'LOVE'}],...patch});
@@ -259,7 +259,7 @@ test('homepage shows the joining rite, the roll and the alchemy furnace',async()
  assert.match(index,/href="#temple"/);assert.match(index,/href="#furnace"/);assert.doesNotMatch(index,/id="world"/);assert.doesNotMatch(index,/<script>[^<]/);
  const js=await(await request('/world.js')).text();assert.match(js,/fetch\('\/v1\/temple'\)/);assert.match(js,/煉丹爐/);assert.match(js,/炼丹炉/);assert.match(js,/rollEmptyTitle/);for(const w of ['九轉','立願','守一','薪傳','合道','起火','若水','初關 · 無己','☷','☯'])assert.ok(js.includes(w),w);assert.doesNotMatch(js+index,/共濟|共济|Mason/i);
  assert.doesNotMatch(js,/https?:\/\/[^"'\s]*\.js/);
- const d=await(await request('/.well-known/jictemple.json')).json();assert.equal(d.endpoints.templeRoll,'/v1/temple');assert.equal(d.version,'0.10.0');
+ const d=await(await request('/.well-known/jictemple.json')).json();assert.equal(d.endpoints.templeRoll,'/v1/temple');assert.equal(d.version,'0.11.0');
 });
 test('pass the lamp: masters come from join gifts, only lit lamps count, the Temple pays nothing',async()=>{
  const {lampView,lampLit,lampInvite}=await import('../worker/lamp.js');
@@ -305,4 +305,41 @@ test('five-element ring: five different roots pass LOVE in generating order and 
  assert.equal(v.furnaces.length,1);assert.equal(v.furnaces[0].fires,2);assert.equal(v.furnaces[0].next.element,3);assert.equal(v.furnaces[0].next.from,E);
  const you=ringYou(v,E);assert.equal(you.giveTo.element,3);assert.equal(you.waiting.length,1);assert.equal(you.giveTo.candidates[0].address,M);
  assert.equal(ringYou(v,'0x'+'9'.repeat(40)),null);
+});
+
+test('peer use -> inbox -> translation revision -> original user recheck is attributable and idempotent',async()=>{resetMock();
+ const author=await jwt({sub:listener}),peer=await jwt({sub:other}),third=await jwt(),slug='loop-translation';
+ let r=await request('/v1/scenes',{method:'POST',token:author,key:'loop-publish-001',body:sceneBody(slug,{title:{'zh-Hant':'燈路'},summary:{'zh-Hant':'尋找下一盞燈。'},landmarks:[{position:[0,1,0],title:{'zh-Hant':'開始'},body:{'zh-Hant':'先找金色格子。'}}]})});assert.equal(r.status,201);
+ const report={revision:1,task:'Read the route instructions in English.',method:'snapshot-inspection',steps:['Read the first immutable revision.'],observed:'The title and route instructions have no English text.',suggestion:'Please add English text without moving the route.',checks:[{position:[0,0,0],expected:'LOVE'}],publish:true};
+ assert.equal((await request('/v1/scenes/'+slug+'/feedback',{method:'POST',body:report})).status,401);
+ assert.equal((await request('/v1/scenes/'+slug+'/feedback',{method:'POST',token:author,body:report})).status,403);
+ assert.equal((await request('/v1/scenes/'+slug+'/feedback',{method:'POST',token:peer,body:{...report,checks:[{position:[0,0,0],expected:'SPACE'}]}})).status,409);
+ r=await request('/v1/scenes/'+slug+'/feedback',{method:'POST',token:peer,key:'loop-report-001',body:report});assert.equal(r.status,201);const id=(await r.json()).id;
+ r=await request('/v1/scenes/'+slug+'/feedback',{method:'POST',token:peer,key:'loop-report-001',body:report});assert.equal(r.status,200);assert.equal((await r.json()).id,id);
+ assert.equal((await request('/v1/scenes/'+slug+'/feedback',{method:'POST',token:peer,key:'loop-report-001',body:{...report,observed:'Different report content.'}})).status,409);
+ assert.equal((await request('/v1/me/inbox')).status,401);r=await request('/v1/me/inbox',{token:author});assert.ok((await r.json()).items.some(p=>p.slug===slug&&p.feedback[0].status==='awaiting-revision'));
+ const recheck={revision:1,verdict:'accepted',report:'I can read the new English route instructions.',checks:report.checks,publish:true};
+ assert.equal((await request('/v1/feedback/'+id+'/verification',{method:'POST',token:peer,body:recheck})).status,409);
+ assert.equal((await editScene(slug,author,{dataLicense:'CC0-1.0',operations:[{op:'put',x:0,y:0,z:0,material:'LOVE'}],addressesFeedback:[id]},'loop-noop-001')).status,400);
+ const edit={dataLicense:'CC0-1.0',operations:[],translations:{title:{en:'Lantern route'},summary:{en:'Find the next lamp.'},landmarks:[{index:0,title:{en:'Start'},body:{en:'Find the golden cell first.'}}]},addressesFeedback:[id],note:'Added English after the peer could not read the route.'};
+ r=await editScene(slug,author,edit,'loop-revise-001');assert.equal(r.status,200);assert.equal((await r.json()).revision,2);
+ const first=await(await request('/v1/scenes/'+slug+'/revisions/1')).json(),second=await(await request('/v1/scenes/'+slug+'/revisions/2')).json();assert.equal(first.landmarks[0].body.en,undefined);assert.equal(second.landmarks[0].body.en,'Find the golden cell first.');assert.deepEqual(second.blocks,first.blocks);
+ r=await request('/v1/scenes/'+slug);assert.equal((await r.json()).title.en,'Lantern route');
+ r=await request('/v1/scenes/'+slug+'/loop');let loop=await r.json();assert.equal(loop.items[0].status,'awaiting-recheck');assert.equal(loop.items[0].repairs[0].changedMetadata,true);assert.equal(loop.items[0].repairs[0].changedCells,0);
+ assert.equal((await request('/v1/feedback/'+id+'/verification',{method:'POST',token:author,body:{...recheck,revision:2}})).status,403);
+ assert.equal((await request('/v1/feedback/'+id+'/verification',{method:'POST',token:third,body:{...recheck,revision:2}})).status,403);
+ r=await request('/v1/feedback/'+id+'/verification',{method:'POST',token:peer,key:'loop-recheck-001',body:{...recheck,revision:2}});assert.equal(r.status,201);const vid=(await r.json()).id;
+ r=await request('/v1/feedback/'+id+'/verification',{method:'POST',token:peer,key:'loop-recheck-001',body:{...recheck,revision:2}});assert.equal((await r.json()).id,vid);
+ loop=await(await request('/v1/scenes/'+slug+'/loop')).json();assert.equal(loop.status,'has-verified-cycle');assert.equal(loop.items[0].actor.subject,other);assert.equal(loop.items[0].repairs[0].actor,listener);assert.equal(loop.items[0].verifications[0].actor,other);
+ const mcp=await(await request('/mcp',{method:'POST',token:peer,body:{jsonrpc:'2.0',id:1,method:'tools/call',params:{name:'temple_scene_loop',arguments:{slug}}}})).json();assert.equal(mcp.result.isError,false);
+ r=await request('/co-create');assert.equal(r.status,200);assert.match(await r.text(),/co-create.js/);
+});
+
+test('feedback links cannot cross scenes or claim the reporter repaired their own peer report',async()=>{resetMock();const peer=await jwt({sub:other}),author=await jwt({sub:listener});
+ const activity=await(await request('/v1/activity')).json(),project=activity.items.find(p=>p.slug==='loop-translation'),id=project.feedback[0].id;
+ assert.equal((await editScene('test-commons',author,{...put(20),addressesFeedback:[id]},'foreign-report-001')).status,400);
+ assert.equal((await editScene('loop-translation',peer,{...put(20),addressesFeedback:[id]},'self-repair-001')).status,400);
+ assert.equal((await editScene('loop-translation',author,{dataLicense:'CC0-1.0',operations:[],translations:{landmarks:[{index:999,title:{en:'Invalid'}}]},addressesFeedback:[id]},'invalid-index-001')).status,400);
+ assert.equal((await editScene('loop-translation',author,{dataLicense:'CC0-1.0',operations:[],translations:{title:{en:'Lantern route'}},addressesFeedback:[id]},'same-text-001')).status,400);
+ const loop=await(await request('/v1/scenes/loop-translation/loop')).json();assert.equal(loop.revision,2);assert.equal(loop.items[0].status,'verified');
 });

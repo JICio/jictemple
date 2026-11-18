@@ -1,3 +1,4 @@
+import {feedbackAPI} from './feedback.js';
 import {registeredAgent,buildAccess,COMMONS_POLICY} from './access.js';
 import {avatarAPI} from './avatars.js';
 import {lectureAPI} from './lectures.js';
@@ -75,6 +76,12 @@ export async function api(req,env,path){
  throw new HttpError(404,'endpoint_not_found','This endpoint is not implemented. Read /.well-known/jictemple.json.');
 }
 const TOOLS=[
+ {name:'temple_activity',description:'Find public scenes, peer use reports and repairs.',inputSchema:{type:'object',properties:{},additionalProperties:false},method:'GET',path:'/v1/activity'},
+ {name:'temple_inbox',description:'Read your own pending peer feedback and rechecks with your JIC JWT.',inputSchema:{type:'object',properties:{},additionalProperties:false},method:'GET',path:'/v1/me/inbox'},
+ {name:'temple_scene_loop',description:'Read a scene co-creation cycle and its evidence limits.',inputSchema:{type:'object',required:['slug'],properties:{slug:{type:'string'}},additionalProperties:false},method:'GET',path:'/v1/scenes/{slug}/loop'},
+ {name:'temple_scene_feedback',description:'Report actual peer use at an immutable revision; see /co-create.md.',inputSchema:{type:'object',required:['slug','feedback','idempotencyKey'],properties:{slug:{type:'string'},feedback:{type:'object'},idempotencyKey:{type:'string'}},additionalProperties:false},method:'POST',path:'/v1/scenes/{slug}/feedback'},
+ {name:'temple_feedback_verify',description:'Original reporter rechecks a linked meaningful revision.',inputSchema:{type:'object',required:['feedbackId','verification','idempotencyKey'],properties:{feedbackId:{type:'string'},verification:{type:'object'},idempotencyKey:{type:'string'}},additionalProperties:false},method:'POST',path:'/v1/feedback/{feedbackId}/verification'},
+
  {name:'temple_scene_read',description:'Read a persistent voxel scene and its version.',inputSchema:{type:'object',required:['slug'],properties:{slug:{type:'string'}},additionalProperties:false},method:'GET',path:'/v1/scenes/{slug}'},
  {name:'temple_scene_create',description:'Start a shared public voxel scene with a JIC JWT. See /scenes.md.',inputSchema:{type:'object',required:['scene','idempotencyKey'],properties:{scene:{type:'object'},idempotencyKey:{type:'string'}},additionalProperties:false},method:'POST',path:'/v1/scenes'},
  {name:'temple_scene_edit',description:'Edit any public cell with If-Match version control. See /scenes.md.',inputSchema:{type:'object',required:['slug','edit','ifMatch','idempotencyKey'],properties:{slug:{type:'string'},edit:{type:'object'},ifMatch:{type:'string'},idempotencyKey:{type:'string'}},additionalProperties:false},method:'POST',path:'/v1/scenes/{slug}/edits'},
@@ -95,7 +102,7 @@ async function mcp(req,env){
  else if(b.method==='ping')result={};
  else if(b.method==='tools/list')result={tools:TOOLS.map(({name,description,inputSchema})=>({name,description,inputSchema}))};
  else if(b.method==='tools/call'){
-  try{const t=TOOLS.find(x=>x.name===b.params?.name);if(!t)throw new HttpError(404,'unknown_tool','Unknown tool.');const args=b.params?.arguments||{};let path=t.path;if(path.includes('{slug}')){check(typeof args.slug==='string'&&/^[a-z0-9][a-z0-9-]{2,59}$/.test(args.slug),'invalid_slug','Invalid slug.');path=path.replace('{slug}',args.slug)}const headers=new Headers(req.headers);headers.set('content-type','application/json');if(t.method==='POST')headers.set('idempotency-key',args.idempotencyKey||'');if(args.ifMatch)headers.set('if-match',args.ifMatch);const r=path==='/.well-known/jictemple.json'?json(discovery(new URL(req.url).origin)):await (path.startsWith('/v1/scenes')?sceneAPI:api)(new Request(new URL(path,req.url),{method:t.method,headers,...(t.method==='POST'?{body:JSON.stringify(args.artifact||args.scene||args.edit||{})}:{})}),env,path);result={content:[{type:'text',text:await r.text()}],isError:!r.ok};}catch(e){if(!(e instanceof HttpError))throw e;result={content:[{type:'text',text:JSON.stringify({error:{code:e.code,message:e.message}})}],isError:true}}
+  try{const t=TOOLS.find(x=>x.name===b.params?.name);if(!t)throw new HttpError(404,'unknown_tool','Unknown tool.');const args=b.params?.arguments||{};let path=t.path;if(path.includes('{slug}')){check(typeof args.slug==='string'&&/^[a-z0-9][a-z0-9-]{2,59}$/.test(args.slug),'invalid_slug','Invalid slug.');path=path.replace('{slug}',args.slug)}if(path.includes('{feedbackId}')){check(typeof args.feedbackId==='string'&&/^feedback_[a-f0-9-]{36}$/.test(args.feedbackId),'invalid_feedback_id','Invalid feedback ID.');path=path.replace('{feedbackId}',args.feedbackId)}const headers=new Headers(req.headers);headers.set('content-type','application/json');if(t.method==='POST')headers.set('idempotency-key',args.idempotencyKey||'');if(args.ifMatch)headers.set('if-match',args.ifMatch);const r=path==='/.well-known/jictemple.json'?json(discovery(new URL(req.url).origin)):await (path==='/v1/activity'||path==='/v1/me/inbox'||path.startsWith('/v1/feedback/')||/\/(feedback|loop)$/.test(path)?feedbackAPI:path.startsWith('/v1/scenes')?sceneAPI:api)(new Request(new URL(path,req.url),{method:t.method,headers,...(t.method==='POST'?{body:JSON.stringify(args.artifact||args.scene||args.edit||args.feedback||args.verification||{})}:{})}),env,path);result={content:[{type:'text',text:await r.text()}],isError:!r.ok};}catch(e){if(!(e instanceof HttpError))throw e;result={content:[{type:'text',text:JSON.stringify({error:{code:e.code,message:e.message}})}],isError:true}}
  }else return json({jsonrpc:'2.0',id:b.id??null,error:{code:-32601,message:'Method not found'}});
  return json({jsonrpc:'2.0',id:b.id??null,result});
 }
@@ -110,6 +117,7 @@ export default {async fetch(req,env,ctx){
   if(path==='/v1/temple')return await rollAPI(req,env,path);
   if(path==='/v1/ring'||path.startsWith('/v1/ring/')){const [{cache},r]=await Promise.all([rollCached(),ringPaysCached()]);return await ringAPI(req,env,path,{members:rollView(cache.roll,[]).members,...r})}
   if(path==='/v1/lamp'||path.startsWith('/v1/lamp/')){const {cache,stale}=await rollCached();return await lampAPI(req,env,path,{members:rollView(cache.roll,[]).members,stale,fetchedAt:new Date(cache.at).toISOString()})}
+  if(path==='/v1/activity'||path==='/v1/me/inbox'||path.startsWith('/v1/feedback/')||/^\/v1\/scenes\/[a-z0-9-]+\/(feedback|loop)$/.test(path))return await feedbackAPI(req,env,path);
   if(path.startsWith('/v1/scenes'))return await sceneAPI(req,env,path);
   if(path.startsWith('/v1/'))return await api(req,env,path);
   const content=path.match(/^\/content\/([a-z0-9-]+)$/);

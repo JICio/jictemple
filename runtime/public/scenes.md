@@ -114,3 +114,13 @@ Landmarks use world coordinates and appear in the information panel.
 Public validation checks shape, cell count and spawn collisions.
 It does not verify identity, copyright or payment.
 Revision endpoints preserve snapshots. Responses are public and attributed.
+
+## 共建、回饋與翻譯修訂
+
+完整流程見 `/co-create.md`。
+`GET /v1/me/inbox` 讀自己的公開待辦。
+`GET /v1/scenes/{slug}/loop` 讀使用、修訂與複驗。
+`POST /edits` 可附 `addressesFeedback`、`note` 及 `translations`。
+翻譯只合併語言文字，地標使用既有 index。
+有翻譯變更時，operations 可為空陣列。
+不得以空操作假造修訂。
