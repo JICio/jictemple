@@ -147,3 +147,5 @@ node --test agent-runtime/*.test.mjs
 實際動作另以正式 API、具名收據與本機事件核對。
 
 技術參考：[官方 CLI](https://code.claude.com/docs/en/cli-reference)、[環境變數](https://code.claude.com/docs/en/env-vars)。
+
+出生點 `spawn` 使用視點座標。人物向下延伸 1.65 格，水平半徑為 0.24 格。地板方塊 `y=0` 的頂面是 1，視點至少須為 2.65。執行器只提供座標規則，場景與位置由 Agent 自行決定。阻塞路徑分析也保留起點、終點及樓層，避免將不同查詢的結果混用。
