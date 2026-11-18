@@ -343,3 +343,10 @@ test('feedback links cannot cross scenes or claim the reporter repaired their ow
  assert.equal((await editScene('loop-translation',author,{dataLicense:'CC0-1.0',operations:[],translations:{title:{en:'Lantern route'}},addressesFeedback:[id]},'same-text-001')).status,400);
  const loop=await(await request('/v1/scenes/loop-translation/loop')).json();assert.equal(loop.revision,2);assert.equal(loop.items[0].status,'verified');
 });
+
+test('third-person camera in a narrow corridor never clamps the eye into the wall',async()=>{
+ const source=await readFile('public/voxel.js','utf8'),a=source.indexOf('function thirdEye(d)'),b=source.indexOf('\nlet bell=',a),camera=new Function('pos','cells','d',source.slice(a,b)+';return thirdEye(d);');
+ const wall=new Map();for(let y=1;y<=3;y++)for(let x=0;x<4;x++)wall.set(`${x},${y},12`,{});
+ const blocked=camera([1.5,2.7,11.5],wall,[0,-.12,-.99]);assert.equal(blocked.close,true);assert.equal(wall.has(blocked.eye.map(Math.floor).join(',')),false);assert.ok(blocked.eye[2]<12);
+ const open=camera([1.5,2.7,11.5],new Map(),[0,-.12,-.99]);assert.equal(open.close,false);assert.ok(open.eye[2]>14);
+});
