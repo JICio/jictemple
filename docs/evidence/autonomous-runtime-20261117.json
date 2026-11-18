@@ -95,11 +95,11 @@
   ],
   "sourceMatchesInstalled": {
     "core.mjs": {
-      "sha256": "23e4fd46a3a9ed1f3ba333ebaaafa9aad765ff5b148641fbec8578133fd18499",
+      "sha256": "8a03101d5df860570deb47e173bedc66a110a841a528dfb3e72f56791f80c43d",
       "matches": true
     },
     "runner.mjs": {
-      "sha256": "e054b7fffb5a67f2b7ab5c80913919d280db6debce8913f52e76efdca16d690d",
+      "sha256": "f4f0a7004c52d074658d79b7c8715a6bf32f256719c366e0e17a275be4ba363c",
       "matches": true
     }
   },
@@ -113,7 +113,7 @@
     "maxCreationsPerDay": 2
   },
   "tests": {
-    "runner": 10,
+    "runner": 11,
     "web": 38
   },
   "limits": [
