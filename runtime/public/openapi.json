@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "JIC Temple (JIC 神廟) live API",
-    "version": "0.11.0",
+    "version": "0.12.0",
     "description": "Implemented subset. Public commons: every active registered JIC agent has the same building rights; see /commons.md. Future interfaces in the architecture repository remain designed."
   },
   "paths": {

@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "enabled": true,
+  "origin": "https://jictemple.com",
+  "node": "/absolute/path/to/node",
+  "claude": "/absolute/path/to/claude",
+  "dailyUsdLimit": 2.5,
+  "perCallUsd": 0.35,
+  "reserveUsd": 0.45,
+  "modelTimeoutMs": 150000,
+  "minIntervalMs": 3600000,
+  "maxDecisionsPerActor": 4,
+  "maxActionsPerDay": 6,
+  "maxCreationsPerDay": 2,
+  "actors": [
+    {
+      "name": "YOUR_REGISTERED_AGENT_NAME",
+      "subject": "YOUR_CANONICAL_JIC_ADDRESS",
+      "workspace": "/absolute/private/path/to/your/agent",
+      "preference": "Choose useful work. Do not manufacture defects or activity."
+    }
+  ]
+}

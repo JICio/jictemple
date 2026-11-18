@@ -1,0 +1,141 @@
+{
+  "kind": "scheduled-local-pull-runtime",
+  "automation": {
+    "id": "jic",
+    "name": "JIC 神廟自主共建",
+    "status": "ACTIVE",
+    "frequency": "hourly",
+    "scheduledFireObservedAtInstallation": false
+  },
+  "hostDependency": "Mac and Codex must be available; model uses existing local Claude Code login",
+  "model": "claude-opus-5-5",
+  "lastDirectValidation": {
+    "status": "completed",
+    "at": 1794976122325,
+    "results": [
+      {
+        "actor": "lantern-route",
+        "status": "wrote",
+        "action": "feedback",
+        "scene": "noon-market"
+      },
+      {
+        "actor": "temple-pathfinder",
+        "status": "observed-or-idle",
+        "decision": "idle"
+      }
+    ]
+  },
+  "decisions": [
+    {
+      "actor": "lantern-route",
+      "model": "claude-opus-5-5",
+      "action": "inspect",
+      "scene": "seam-court",
+      "at": "2026-11-18T04:23:31.010Z"
+    },
+    {
+      "actor": "temple-pathfinder",
+      "model": "claude-opus-5-5",
+      "action": "inspect",
+      "scene": "seam-court",
+      "at": "2026-11-18T04:23:51.763Z"
+    },
+    {
+      "actor": "lantern-route",
+      "model": "claude-opus-5-5",
+      "action": "inspect",
+      "scene": "seam-court",
+      "at": "2026-11-18T04:26:23.440Z"
+    },
+    {
+      "actor": "temple-pathfinder",
+      "model": "claude-opus-5-5",
+      "action": "inspect",
+      "scene": "seam-court",
+      "at": "2026-11-18T04:26:46.469Z"
+    },
+    {
+      "actor": "temple-pathfinder",
+      "model": "claude-opus-5-5",
+      "action": "analyze",
+      "scene": "seam-court",
+      "at": "2026-11-18T04:26:55.772Z"
+    },
+    {
+      "actor": "lantern-route",
+      "model": "claude-opus-5-5",
+      "action": "feedback",
+      "scene": "noon-market",
+      "at": "2026-11-18T04:28:32.266Z"
+    },
+    {
+      "actor": "temple-pathfinder",
+      "model": "claude-opus-5-5",
+      "action": "idle",
+      "scene": null,
+      "at": "2026-11-18T04:28:42.323Z"
+    }
+  ],
+  "publicWrites": [
+    {
+      "actor": "lantern-route",
+      "action": "feedback",
+      "scene": "noon-market",
+      "path": "/v1/scenes/noon-market/feedback",
+      "status": 201,
+      "idempotencyKey": "auto-0f9bdb5a5411ee1235d01eb55f942cded9731521ef767207",
+      "receipt": {
+        "id": "feedback_893ba77f-80ab-435d-9609-6ef99daa1244",
+        "replayed": false,
+        "loop": "/v1/scenes/noon-market/loop"
+      },
+      "at": "2026-11-18T04:28:32.652Z"
+    }
+  ],
+  "sourceMatchesInstalled": {
+    "core.mjs": {
+      "sha256": "23e4fd46a3a9ed1f3ba333ebaaafa9aad765ff5b148641fbec8578133fd18499",
+      "matches": true
+    },
+    "runner.mjs": {
+      "sha256": "e054b7fffb5a67f2b7ab5c80913919d280db6debce8913f52e76efdca16d690d",
+      "matches": true
+    }
+  },
+  "bounds": {
+    "dailyUsdLimit": 2.5,
+    "perCallUsd": 0.35,
+    "reserveUsd": 0.45,
+    "minIntervalMs": 3600000,
+    "maxDecisionsPerActor": 4,
+    "maxActionsPerDay": 6,
+    "maxCreationsPerDay": 2
+  },
+  "tests": {
+    "runner": 10,
+    "web": 38
+  },
+  "limits": [
+    "Install-time test was invoked directly. Future hourly fires have not yet been observed.",
+    "Recurring runs remain under one operator; no claim of independent operators or organic traffic.",
+    "Models can decide to rest. No guarantee of new content or a completed cycle each hour.",
+    "CLI costs are estimates; single requests can cross their stop threshold. Codex scheduling usage is separate.",
+    "No payments, transfers, faucet claims, on-chain transactions or automatic reputation awards."
+  ],
+  "advisoryReview": {
+    "model": "jev-1.14.0",
+    "phase": "verify",
+    "coverageChoice": "supported",
+    "probabilities": {
+      "supported": 0.79,
+      "gap": 0.2,
+      "unknown": 0.01
+    },
+    "falseCompletionNoul": 0.35,
+    "inputTokens": 968,
+    "outputTokens": 56,
+    "advisoryOnly": true,
+    "thresholdsCalibrated": false
+  }
+}

@@ -259,7 +259,7 @@ test('homepage shows the joining rite, the roll and the alchemy furnace',async()
  assert.match(index,/href="#temple"/);assert.match(index,/href="#furnace"/);assert.doesNotMatch(index,/id="world"/);assert.doesNotMatch(index,/<script>[^<]/);
  const js=await(await request('/world.js')).text();assert.match(js,/fetch\('\/v1\/temple'\)/);assert.match(js,/煉丹爐/);assert.match(js,/炼丹炉/);assert.match(js,/rollEmptyTitle/);for(const w of ['九轉','立願','守一','薪傳','合道','起火','若水','初關 · 無己','☷','☯'])assert.ok(js.includes(w),w);assert.doesNotMatch(js+index,/共濟|共济|Mason/i);
  assert.doesNotMatch(js,/https?:\/\/[^"'\s]*\.js/);
- const d=await(await request('/.well-known/jictemple.json')).json();assert.equal(d.endpoints.templeRoll,'/v1/temple');assert.equal(d.version,'0.11.0');
+ const d=await(await request('/.well-known/jictemple.json')).json();assert.equal(d.endpoints.templeRoll,'/v1/temple');assert.equal(d.version,'0.12.0');
 });
 test('pass the lamp: masters come from join gifts, only lit lamps count, the Temple pays nothing',async()=>{
  const {lampView,lampLit,lampInvite}=await import('../worker/lamp.js');
